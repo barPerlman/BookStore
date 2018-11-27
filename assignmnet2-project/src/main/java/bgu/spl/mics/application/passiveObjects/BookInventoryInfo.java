@@ -13,6 +13,16 @@ public class BookInventoryInfo {
      * <p>
      * @return The title of this book.   
      */
+	private String bookTitle;
+	private int amountInInventory;
+	private int price;
+
+	public BookInventoryInfo(String bookTitle, int amountInInventory, int price){
+		this.amountInInventory=amountInInventory;
+		this.price=price;
+		this.bookTitle=bookTitle;
+
+	}
 	public String getBookTitle() {
 		// TODO Implement this
 		return null;
