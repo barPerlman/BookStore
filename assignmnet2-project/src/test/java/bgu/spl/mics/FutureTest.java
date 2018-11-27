@@ -106,6 +106,12 @@ public class FutureTest {
      */
     @Test
     public void get1() {
+
+
+        //after implementation of Future class its required to update the test by assign null to the result field at the
+        //begining of the method so the OUT will be clean and ready for the new tests
+
+        //the following test is checked with delivery vehicle instance only
         //sample test to check the method can return null as get
         assertNull("should be null since the object didn't resolve on time",deliveryVehicle_future.get(1, TimeUnit.SECONDS));
         //resove the object in aim to test positively get of the proper class
