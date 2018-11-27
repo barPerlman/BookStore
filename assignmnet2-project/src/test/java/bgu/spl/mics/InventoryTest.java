@@ -111,12 +111,12 @@ public class InventoryTest {
         inventory.load(books);
         inventory.printInventoryToFile(stringName);
         HashMap<String,Integer> hashMapFromFile2=readFromFile(stringName);
-        HashMap<String,Integer> hashMapOrginal2=createHashMap(books);
-        assertEquals(hashMapFromFile2,hashMapOrginal2);
+        HashMap<String,Integer> hashMapOriginal2=createHashMap(books);
+        assertEquals(hashMapFromFile2,hashMapOriginal2);
     }
 
     /**
-     * A private function that creats a hashmap.
+     * A private function that creates a hashmap.
      * @param booksArray - the array that needs to be convert to a hashmap
      * @return the hashmap that describes the inventory.
      */

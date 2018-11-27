@@ -55,7 +55,7 @@ public class FutureTest {
 
 
        //now resolve the Future objects so we could check the proper instances are received
-        bookInventoryInfo_future.resolve(new BookInventoryInfo());
+        bookInventoryInfo_future.resolve(new BookInventoryInfo("Harry Poter 2",2,90));
         assertEquals("BookInventoryInfo",bookInventoryInfo_future.get().getClass().getName());
         orderReceipt_future.resolve(new OrderReceipt());
         assertEquals("OrderReceipt",orderReceipt_future.get().getClass().getName());
@@ -72,7 +72,7 @@ public class FutureTest {
     @Test
     public void resolve() {
         //checks resolve of type book inventory info result
-        bookInventoryInfo_future.resolve(new BookInventoryInfo());
+        bookInventoryInfo_future.resolve(new BookInventoryInfo("Harry Poter 2",2,90));
         assertEquals("BookInventoryInfo",bookInventoryInfo_future.get().getClass().getName());
 
         //checks resolve of type order receipt result
@@ -94,7 +94,7 @@ public class FutureTest {
         assertFalse("isDone expected:false",bookInventoryInfo_future.isDone());
 
         //here we check the status when its resolved
-        bookInventoryInfo_future.resolve(new BookInventoryInfo());
+        bookInventoryInfo_future.resolve(new BookInventoryInfo("Harry Poter 2",2,90));
         assertTrue("isDone expected: true",bookInventoryInfo_future.isDone());
     }
 
@@ -109,12 +109,12 @@ public class FutureTest {
 
 
         //after implementation of Future class its required to update the test by assign null to the result field at the
-        //begining of the method so the OUT will be clean and ready for the new tests
+        //beginning of the method so the OUT will be clean and ready for the new tests
 
         //the following test is checked with delivery vehicle instance only
         //sample test to check the method can return null as get
         assertNull("should be null since the object didn't resolve on time",deliveryVehicle_future.get(1, TimeUnit.SECONDS));
-        //resove the object in aim to test positively get of the proper class
+        //resolve the object in aim to test positively get of the proper class
         deliveryVehicle_future.resolve(new DeliveryVehicle(1,1));
         assertEquals("DeliveryVehicle",deliveryVehicle_future.get(1,TimeUnit.MICROSECONDS).getClass().getName());
 
