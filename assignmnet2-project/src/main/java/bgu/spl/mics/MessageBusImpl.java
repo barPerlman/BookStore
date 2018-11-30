@@ -12,9 +12,9 @@ public class MessageBusImpl implements MessageBus {
 	//@INV: the initialization of the singleton successfully completed
 
 	/**
-	 * the followings are methods for implementation of the trhread safe singleton
+	 * the followings are methods for implementation of the thread safe singleton
 	 * the method used for the thread safe which is called  "Initialization-on-demand holder (design pattern) idiom"
-	 * this thread safety is guarenteed by the jvm initialization classes
+	 * this thread safety is guaranteed by the jvm initialization classes
 	 * */
 
 	//private constructor
@@ -50,8 +50,8 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-		// TODO Auto-generated method stub
-
+		//resolve the result that is associated with the received event
+		e.get_futureResult().resolve(result);
 	}
 
 	@Override

@@ -8,5 +8,6 @@ package bgu.spl.mics;
  * Round-Robin fashion.
  */
 public interface Event<T> extends Message {
-
+    //getter for the Future object that is associated with the event
+    Future<T> get_futureResult();
 }
