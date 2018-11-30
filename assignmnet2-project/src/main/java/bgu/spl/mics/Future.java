@@ -12,13 +12,14 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class Future<T> {
 	//@INV: this!=null
-
+    Object _lock;
 	private AtomicReference<T> _result;    //holds the result of the associated operation
 	/**
 	 * This should be the only public constructor in this class.
 	 */
 	public Future() {
-		_result=new AtomicReference<>(null);
+	    _lock=new Object();     //init the lock object
+		_result=new AtomicReference<>(null);    //init the result as not resolved
 	}
 
 	/**
@@ -49,7 +50,7 @@ public class Future<T> {
 			newResult=result;
 		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
 
-		notifyAll();	//notify the threads which are waiting for the result to be resolve
+		//notifyAll();	//notify the threads which are waiting for the result to be resolve
 
 	}
 
@@ -75,13 +76,14 @@ public class Future<T> {
 	//@PRE: @param timeout>0 @param unit!=null
 	public T get(long timeout, TimeUnit unit) {
 		try{
-            while(!isDone()) {                          //result is not resolved
-                wait(unit.toMillis(timeout));   //here the thread will wait timeout amount of time in this's waiting list
-                break;                                  //after the sleep go out and return null
+		    synchronized (_lock) {
+                while (!isDone()) {                          //result is not resolved
+                    _lock.wait(unit.toMillis(timeout));   //here the thread will wait timeout amount of time in this's waiting list
+                    break;                                  //after the sleep go out and return null
+                }
             }
 		}catch(InterruptedException ignore){            //return
-		    return _result.get();
         }
-    return null;
+        return _result.get();
     }
 }
