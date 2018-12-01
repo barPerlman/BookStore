@@ -2,7 +2,7 @@ package bgu.spl.mics.example.messages;
 
 import bgu.spl.mics.Event;
 
-public class ExampleEvent implements Event<String>{
+public abstract class ExampleEvent implements Event<String>{
 
     private String senderName;
 

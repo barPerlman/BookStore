@@ -50,7 +50,7 @@ public class Future<T> {
 			newResult=result;
 		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
 
-		//notifyAll();	//notify the threads which are waiting for the result to be resolve
+		notifyAll();	//notify the threads which are waiting for the result to be resolve
 
 	}
 
