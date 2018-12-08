@@ -11,15 +11,39 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/bgu/spl/mics/MessageBusImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1669">
+              <caret line="125" column="17" selection-start-line="125" selection-start-column="17" selection-end-line="125" selection-end-column="17" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#2171#2172#0" expanded="true" />
+                <element signature="e#2200#2201#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/bgu/spl/mics/Future.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="855">
-              <caret line="45" column="5" lean-forward="true" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="5" />
+            <state relative-caret-position="401">
+              <caret line="42" column="13" lean-forward="true" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#2208#2209#0" expanded="true" />
                 <element signature="e#2293#2294#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/FutureTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="350">
+              <caret line="125" selection-start-line="125" selection-end-line="125" />
             </state>
           </provider>
         </entry>
@@ -133,7 +157,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544254231118" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544258336095" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/junit-4.10.jar!/" />
@@ -220,27 +244,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 11m 40s.xml">
-      <configuration name="FutureTest (1)" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 12m 21s.xml">
-      <configuration name="FutureTest (1)" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 14m 29s.xml">
-      <configuration name="FutureTest (1)" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 15m 31s.xml">
-      <configuration name="FutureTest (1)" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 15m 58s.xml">
-      <configuration name="FutureTest (1)" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 16m 09s.xml">
-      <configuration name="FutureTest (1)" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 17m 19s.xml">
-      <configuration name="FutureTest (1)" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 20m 27s.xml">
       <configuration name="FutureTest (1)" configurationId="JUnit" />
     </history-entry>
@@ -248,6 +251,27 @@
       <configuration name="FutureTest (1)" configurationId="JUnit" />
     </history-entry>
     <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 30m 06s.xml">
+      <configuration name="FutureTest (1)" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 36m 37s.xml">
+      <configuration name="FutureTest (1)" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 36m 49s.xml">
+      <configuration name="FutureTest (1)" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 49m 12s.xml">
+      <configuration name="FutureTest (1)" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FutureTest_(1) - 2018.12.08 at 09h 49m 32s.xml">
+      <configuration name="FutureTest (1)" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FutureTest_(1) - 2018.12.08 at 10h 16m 55s.xml">
+      <configuration name="FutureTest (1)" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FutureTest_(1) - 2018.12.08 at 10h 17m 54s.xml">
+      <configuration name="FutureTest (1)" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FutureTest_(1) - 2018.12.08 at 10h 18m 32s.xml">
       <configuration name="FutureTest (1)" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -445,10 +469,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/FutureTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bgu/spl/mics/MessageBusImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="33" column="5" selection-start-line="33" selection-start-column="5" selection-end-line="33" selection-end-column="5" />
+        <state relative-caret-position="1669">
+          <caret line="125" column="17" selection-start-line="125" selection-start-column="17" selection-end-line="125" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2171#2172#0" expanded="true" />
@@ -457,19 +488,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/FutureTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-855">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bgu/spl/mics/Future.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
-          <caret line="45" column="5" lean-forward="true" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="5" />
+        <state relative-caret-position="401">
+          <caret line="42" column="13" lean-forward="true" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#2208#2209#0" expanded="true" />
             <element signature="e#2293#2294#0" expanded="true" />
           </folding>
         </state>

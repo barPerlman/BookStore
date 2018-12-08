@@ -36,8 +36,9 @@ public class Future<T> {
 		synchronized (_lock) {
 			while (!isDone()) {                //as long as the Future object is not resolved (Precondition blocking) block continuing
 				try {
-					wait();
+					_lock.wait();
 				} catch (InterruptedException ignore) {
+					Thread.currentThread().interrupt();
 				}
 			}
 			return _result.get();			//here the result is available
@@ -59,7 +60,7 @@ public class Future<T> {
 			newResult=result;
 		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
 		_isResolved=true;			//update the status of the future object to resolved
-		//notifyAll();				//notify the threads which are waiting for the result to be resolve
+		//_lock.notifyAll();				//notify the threads which are waiting for the result to be resolve
 
 	}
 
@@ -92,6 +93,7 @@ public class Future<T> {
 				}
 			}
 		}catch(InterruptedException ignore){            //return
+			Thread.currentThread().interrupt();
 		}
 		return _result.get();
 	}
