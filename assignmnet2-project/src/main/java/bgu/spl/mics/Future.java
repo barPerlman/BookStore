@@ -12,7 +12,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class Future<T> {
 	//@INV: this!=null
-	Object _lock;
+	private Object _lock;	//lock object for get functions
+	private boolean _isResolved;	//tells if this Future object is resolved-true,else-false
 	private AtomicReference<T> _result;    //holds the result of the associated operation
 	/**
 	 * This should be the only public constructor in this class.
@@ -32,8 +33,16 @@ public class Future<T> {
 	 */
 	//@PRE: result!=null
 	public T get() {
-		while(!isDone());	//as long as the Future object is not resolved (Precond blocking) block continuing
-		return _result.get();			//here the result is available
+		synchronized (_lock) {
+			while (!isDone()) {                //as long as the Future object is not resolved (Precondition blocking) block continuing
+				try {
+					wait();
+				} catch (InterruptedException ignore) {
+				}
+			}
+			return _result.get();			//here the result is available
+		}
+
 	}
 
 	/**
@@ -49,8 +58,8 @@ public class Future<T> {
 			localResult=this._result.get();
 			newResult=result;
 		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
-
-		//notifyAll();	//notify the threads which are waiting for the result to be resolve
+		_isResolved=true;			//update the status of the future object to resolved
+		//notifyAll();				//notify the threads which are waiting for the result to be resolve
 
 	}
 
@@ -59,7 +68,7 @@ public class Future<T> {
 	 */
 	//@PRE: none
 	public boolean isDone() {
-		return _result.get()!=null;	//the result holds the T object if resolved,otherwise-false
+		return _isResolved;	//the result holds the T object if resolved,otherwise-false
 	}
 
 	/**
