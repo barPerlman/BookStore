@@ -4,10 +4,7 @@ package bgu.spl.mics.application.passiveObjects;
 
 import org.junit.Test;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -109,6 +106,11 @@ public class Inventory {
      * This method is called by the main method in order to generate the output.
      */
 	public void printInventoryToFile(String filename){
-		//TODO: Implement this
+		try{
+			FileOutputStream fos =new FileOutputStream(filename);
+			ObjectOutputStream oos=new ObjectOutputStream(fos);
+			oos.writeObject(booksInventoryInfo);
+		}catch(IOException ignore){
+		}
 	}
 }
