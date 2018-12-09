@@ -1,4 +1,3 @@
-package bgu.spl.mics;
 
 import bgu.spl.mics.application.passiveObjects.BookInventoryInfo;
 import bgu.spl.mics.application.passiveObjects.Inventory;
@@ -88,7 +87,7 @@ public class InventoryTest {
         books[1]= new BookInventoryInfo("Alice in wonderland",3,50);
         books[2]= new BookInventoryInfo("How to cook?",1,60);
         inventory.load(books);
-        assertNotEquals(90,inventory.checkAvailabiltyAndGetPrice("Harry Poter 2"));
+        assertEquals(90,inventory.checkAvailabiltyAndGetPrice("Harry Poter 2"));
     }
 
     @Test

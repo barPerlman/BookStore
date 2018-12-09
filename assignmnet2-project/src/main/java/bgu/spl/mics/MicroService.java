@@ -23,9 +23,14 @@ import java.util.HashMap;
  */
 public abstract class MicroService implements Runnable {
 
+    /*private enum MessageType{
+        CALLBACK, BROADCAST;
+    }*/
     private boolean terminated = false;
     private final String name;
+
     private HashMap<Class,Callback> callBacksMap;
+
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -58,7 +63,9 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
+
         this.callBacksMap.put(type,callback);
+
         MessageBusImpl.getInstance().subscribeEvent(type,this);
     }
 
@@ -83,7 +90,9 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
+
         this.callBacksMap.put(type,callback);
+
         MessageBusImpl.getInstance().subscribeBroadcast(type,this);
     }
 

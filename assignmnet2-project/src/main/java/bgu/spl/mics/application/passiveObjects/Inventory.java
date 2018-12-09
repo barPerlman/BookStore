@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
+
 import org.junit.Test;
 
 import java.io.FileInputStream;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.assertEquals;
+
 
 /**
  * Passive data-object representing the store inventory.
@@ -27,6 +29,7 @@ public class Inventory {
 	private static ConcurrentHashMap<String,BookInventoryInfo> booksInventoryInfo;
 	private static Inventory instance =null;
 
+
 	private Inventory(){
 		booksInventoryInfo = new ConcurrentHashMap<>();
 	}
@@ -34,6 +37,7 @@ public class Inventory {
 	/**
 	 * Retrieves the single instance of this class.
 	 */
+
 	public static Inventory getInstance() {
 		if(instance==null){
 			instance=new Inventory();
