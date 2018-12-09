@@ -2,6 +2,13 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.Future;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+
 /**
  * Passive object representing the resource manager.
  * You must not alter any of the given public methods of this class.
@@ -11,14 +18,27 @@ import bgu.spl.mics.Future;
  * <p>
  * You can add ONLY private methods and fields to this class.
  */
-public class ResourcesHolder {
-	
+public class ResourcesHolder {		//in this class we use semaphore in aim to acquire and release vehicle
+
+	private ConcurrentLinkedQueue<DeliveryVehicle> _storedVehicles;		//holds the stored delivery vehicles
+	private Semaphore _sem;
+
+	private static class ResourceHolderHolder {
+		private static final ResourcesHolder INSTANCE = new ResourcesHolder();
+	}
+
+	/**
+	 * private constructor as part of the thread safe singleton
+	 */
+	private ResourcesHolder(){
+		_storedVehicles= new ConcurrentLinkedQueue<>();	//init a concurrent queue of vehicles
+	}
+
 	/**
      * Retrieves the single instance of this class.
      */
 	public static ResourcesHolder getInstance() {
-		//TODO: Implement this
-		return null;
+		return ResourceHolderHolder.INSTANCE;
 	}
 	
 	/**
@@ -29,8 +49,15 @@ public class ResourcesHolder {
      * 			{@link DeliveryVehicle} when completed.   
      */
 	public Future<DeliveryVehicle> acquireVehicle() {
-		//TODO: Implement this
-		return null;
+
+		try {
+			_sem.acquire();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+		Future<DeliveryVehicle> future=new Future<>();	//in case the released amount of vehicles>=permits
+		future.resolve(_storedVehicles.poll());
+		return future;
 	}
 	
 	/**
@@ -40,7 +67,8 @@ public class ResourcesHolder {
      * @param vehicle	{@link DeliveryVehicle} to be released.
      */
 	public void releaseVehicle(DeliveryVehicle vehicle) {
-		//TODO: Implement this
+		_storedVehicles.add(vehicle);
+		_sem.release();
 	}
 	
 	/**
@@ -49,7 +77,12 @@ public class ResourcesHolder {
      * @param vehicles	Array of {@link DeliveryVehicle} instances to store.
      */
 	public void load(DeliveryVehicle[] vehicles) {
-		//TODO: Implement this
+		//init a semaphore with permits according to the amount of received vehicles and fair policy
+		_sem=new Semaphore(vehicles.length,true);
+		for(int i=0;i<vehicles.length;i++){
+			_storedVehicles.add(vehicles[i]);
+		}
+
 	}
 
 }

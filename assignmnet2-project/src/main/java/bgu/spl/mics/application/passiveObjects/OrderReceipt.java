@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import java.io.Serializable;
+
 /**
  * Passive data-object representing a receipt that should 
  * be sent to a customer after the completion of a BookOrderEvent.
@@ -7,7 +9,7 @@ package bgu.spl.mics.application.passiveObjects;
  * <p>
  * You may add fields and methods to this class as you see fit (including public methods).
  */
-public class OrderReceipt {
+public class OrderReceipt implements Serializable {
 
 
 	//class members
@@ -19,6 +21,11 @@ public class OrderReceipt {
 	private int _issuedTick;
 	private int _orderTick;
 	private int _processTick;
+
+	/**
+	 * empty constructor
+	 */
+	public OrderReceipt(){}
 
 	/**
 	 * constructor
@@ -42,8 +49,26 @@ public class OrderReceipt {
 		this._processTick = processTick;
 	}
 
+	/**
+	 * constructor
+	 * @param issuedTick
+	 * @param seller
+	 * @param customerId
+	 * @param bookTitle
+	 * @param price
+	 * @param orderTick
+	 */
+	public OrderReceipt (int issuedTick,String seller,int customerId,String bookTitle,int price,int orderTick){
+		this._issuedTick=issuedTick;
+		this._seller=seller;
+		this._customer=customerId;
+		this._bookTitle=bookTitle;
+		this._price=price;
+		this._orderTick=orderTick;
+	}
 
 
+//getters
 	/**
      * Retrieves the orderId of this receipt.
      */
@@ -102,4 +127,32 @@ public class OrderReceipt {
 	public int getProcessTick() {
 		return _processTick;
 	}
+
+	//setters
+	public void setOrderId(int orderId){
+		this._orderId=orderId;
+	}
+	public void setSeller(String seller){
+		this._seller=seller;
+	}
+	public void setCustomerId(int customerId){
+		this._customer=customerId;
+	}
+	public void setBookTitle(String bookTitle){
+		this._bookTitle=bookTitle;
+	}
+	public void setPrice(int price){
+		this._price=price;
+	}
+	public void setissuedTick(int issuedTick){
+		this._issuedTick=issuedTick;
+	}
+	public void setOrderTick(int orderTick){
+		this._orderTick=orderTick;
+	}
+	public void setProccessTick(int proccessTick){
+		this._processTick=proccessTick;
+	}
+
 }
+

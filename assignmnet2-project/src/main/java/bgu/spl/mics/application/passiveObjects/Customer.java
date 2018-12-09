@@ -90,11 +90,19 @@ public class Customer {
 	 * Update the custumer's money amount left in card after purchase
 	 * @param amountToCharge
 	 */
-	public void chargeCard(int amountToCharge){
+	public void chargeCard(int amountToCharge){		//using atomic integer method
 		int localLeftAmount;
 		do{
 			localLeftAmount=_availableAmountInCreditCard.get();
 		}while(!_availableAmountInCreditCard.compareAndSet(localLeftAmount,localLeftAmount-amountToCharge));
+	}
+
+	/**
+	 * add the receipt r to the order receipts list of the customer
+	 * @param r
+	 */
+	public void addReceipt(OrderReceipt r){
+		_receipts.add(r);
 	}
 	
 }
