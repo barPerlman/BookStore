@@ -57,7 +57,7 @@ public class FutureTest {
        //now resolve the Future objects so we could check the proper instances are received
         bookInventoryInfo_future.resolve(new BookInventoryInfo("Harry Poter 2",2,90));
         assertEquals("bgu.spl.mics.application.passiveObjects.BookInventoryInfo",bookInventoryInfo_future.get().getClass().getName());
-        orderReceipt_future.resolve(new OrderReceipt());
+        orderReceipt_future.resolve(new OrderReceipt(1,"s",1,"s",1,1,1,1));
         assertEquals("bgu.spl.mics.application.passiveObjects.OrderReceipt",orderReceipt_future.get().getClass().getName());
         deliveryVehicle_future.resolve(new DeliveryVehicle(1,1));   //resolve custom delivery car for test
         assertEquals("bgu.spl.mics.application.passiveObjects.DeliveryVehicle",deliveryVehicle_future.get().getClass().getName());
@@ -81,7 +81,7 @@ public class FutureTest {
         assertEquals("bgu.spl.mics.application.passiveObjects.BookInventoryInfo",bookInventoryInfo_future.get().getClass().getName());
 
         //checks resolve of type order receipt result
-        orderReceipt_future.resolve(new OrderReceipt());
+        orderReceipt_future.resolve(new OrderReceipt(1,"s",1,"s",1,1,1,1));
         assertEquals("bgu.spl.mics.application.passiveObjects.OrderReceipt",orderReceipt_future.get().getClass().getName());
 
         //checks resolve of type delivery vehicle result

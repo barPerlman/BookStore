@@ -8,21 +8,54 @@ package bgu.spl.mics.application.passiveObjects;
  * You may add fields and methods to this class as you see fit (including public methods).
  */
 public class OrderReceipt {
-	
+
+
+	//class members
+	private int _orderId;			//id if order
+	private  String _seller;			//name of the service that handled this order
+	private int _customer;			//customer id
+	private String _bookTitle;		//book name
+	private int _price;
+	private int _issuedTick;
+	private int _orderTick;
+	private int _processTick;
+
+	/**
+	 * constructor
+	 * @param orderId
+	 * @param seller
+	 * @param customer
+	 * @param bookTitle
+	 * @param price
+	 * @param issuedTick
+	 * @param orderTick
+	 * @param processTick
+	 */
+	public OrderReceipt(int orderId, String seller, int customer, String bookTitle, int price, int issuedTick, int orderTick, int processTick) {
+		this._orderId = orderId;
+		this._seller = seller;
+		this._customer = customer;
+		this._bookTitle = bookTitle;
+		this._price = price;
+		this._issuedTick = issuedTick;
+		this._orderTick = orderTick;
+		this._processTick = processTick;
+	}
+
+
+
 	/**
      * Retrieves the orderId of this receipt.
      */
 	public int getOrderId() {
-		// TODO Implement this
-		return 0;
+		return _orderId;
 	}
 	
 	/**
      * Retrieves the name of the selling service which handled the order.
      */
 	public String getSeller() {
-		// TODO Implement this
-		return null;
+		return _seller;
 	}
 	
 	/**
@@ -31,40 +64,35 @@ public class OrderReceipt {
      * @return the ID of the customer
      */
 	public int getCustomerId() {
-		// TODO Implement this
-		return 0;
+		return _customer;
 	}
 	
 	/**
      * Retrieves the name of the book which was bought.
      */
 	public String getBookTitle() {
-		// TODO Implement this
-		return null;
+		return _bookTitle;
 	}
 	
 	/**
      * Retrieves the price the customer paid for the book.
      */
 	public int getPrice() {
-		// TODO Implement this
-		return 0;
+		return _price;
 	}
 	
 	/**
      * Retrieves the tick in which this receipt was issued.
      */
 	public int getIssuedTick() {
-		// TODO Implement this
-		return 0;
+		return _issuedTick;
 	}
 	
 	/**
      * Retrieves the tick in which the customer sent the purchase request.
      */
 	public int getOrderTick() {
-		// TODO Implement this
-		return 0;
+		return _orderTick;
 	}
 	
 	/**
@@ -72,7 +100,6 @@ public class OrderReceipt {
      * processing the order.
      */
 	public int getProcessTick() {
-		// TODO Implement this
-		return 0;
+		return _processTick;
 	}
 }

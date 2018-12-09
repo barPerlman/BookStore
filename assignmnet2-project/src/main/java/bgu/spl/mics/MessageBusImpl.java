@@ -146,7 +146,7 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public synchronized void unregister(MicroService m) {
-			//unresolve the micro service futures
+			//resolve the micro service futures to null (not resolved)
 			LinkedBlockingQueue<Future> futuresToNull= _microServiceToFuture.get(m);
 			for(Future f: futuresToNull){
 				f.resolve(null);
