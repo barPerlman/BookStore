@@ -1,7 +1,18 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
+
+import org.junit.Test;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * Passive data-object representing the store inventory.
@@ -17,13 +28,16 @@ public class Inventory {
 
 	private static ConcurrentHashMap<String,BookInventoryInfo> booksInventoryInfo;
 	private static Inventory instance =null;
-	/**
-     * Retrieves the single instance of this class.
-     */
+
 
 	private Inventory(){
 		booksInventoryInfo = new ConcurrentHashMap<>();
 	}
+
+	/**
+	 * Retrieves the single instance of this class.
+	 */
+
 	public static Inventory getInstance() {
 		if(instance==null){
 			instance=new Inventory();
@@ -57,12 +71,18 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
-		
-		return null;
+		// if the book is exist in the pool
+		// if the book is exist in the pool and if the capacity of the book is up to 0
+		if(this.booksInventoryInfo.contains(book)&&this.booksInventoryInfo.get(book).getAmountInInventory()>0){
+			int sum = this.booksInventoryInfo.get(book).getAmountInInventory();
+				this.booksInventoryInfo.get(book).setAmountInInventory(sum - 1);
+				return OrderResult.SUCCESSFULLY_TAKEN;
+		}
+		else{// the bis the book is not exist in the pool or it's capacity is 0
+			return  OrderResult.NOT_IN_STOCK;
+		}
 	}
-	
-	
-	
+
 	/**
      * Checks if a certain book is available in the inventory.
      * <p>
@@ -70,14 +90,20 @@ public class Inventory {
      * @return the price of the book if it is available, -1 otherwise.
      */
 	public int checkAvailabiltyAndGetPrice(String book) {
-		//TODO: Implement this
-		return -1;
+		// if the book is exist in the pool and if the capacity of the book is up to 0
+		if(this.booksInventoryInfo.contains(book)&&this.booksInventoryInfo.get(book).getAmountInInventory()>0){
+			return this.booksInventoryInfo.get(book).getPrice();
+		}
+		else{// the book is not exist in the pool or it's capacity is 0
+			return  -1;
+		}
 	}
 	
 	/**
      * 
      * <p>
-     * Prints to a file name @filename a serialized object HashMap<String,Integer> which is a Map of all the books in the inventory. The keys of the Map (type {@link String})
+     * Prints to a file name @filename a serialized object HashMap<String,Integer> which is a Map
+	 * of all the books in the inventory. The keys of the Map (type {@link String})
      * should be the titles of the books while the values (type {@link Integer}) should be
      * their respective available amount in the inventory. 
      * This method is called by the main method in order to generate the output.
