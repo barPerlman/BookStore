@@ -67,6 +67,17 @@ public class OrderReceipt implements Serializable {
 		this._orderTick=orderTick;
 	}
 
+	public OrderReceipt (OrderReceipt other){
+		this._orderId = other.getOrderId();
+		this._seller = other.getSeller();
+		this._customer = other.getCustomerId();
+		this._bookTitle = other.getBookTitle();
+		this._price = other.getPrice();
+		this._issuedTick = other.getIssuedTick();
+		this._orderTick = other.getOrderTick();
+		this._processTick = other.getProcessTick();
+	}
+
 
 //getters
 	/**
