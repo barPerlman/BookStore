@@ -49,7 +49,7 @@ public class APIService extends MicroService{
 					Future<OrderReceipt> future = sendEvent(new BookOrderEvent(orderSchedule.get(i).getNameBook(),this.customer,orderTickTime));
 					if(future.get(1, TimeUnit.MILLISECONDS)!=null){
 						OrderReceipt orderReceipt = new OrderReceipt(future.get());
-						this.customer.addReceipts(orderReceipt);
+						this.customer.addReceipt(orderReceipt);
 					}
 				}
 				else if(orderSchedule.get(i).getStartTick()>c.getCurrTick())
