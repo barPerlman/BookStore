@@ -15,6 +15,7 @@ import bgu.spl.mics.application.passiveObjects.Inventory;
  * You can add private fields and public methods to this class.
  * You MAY change constructor signatures and even add new public constructors.
  */
+/*
 public class LogisticsService extends MicroService {
 
 	public LogisticsService(String name) {
@@ -30,4 +31,4 @@ public class LogisticsService extends MicroService {
 		});
 	}
 
-}
+}*/
