@@ -4,6 +4,8 @@ import bgu.spl.mics.application.passiveObjects.BookInventoryInfo;
 import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
+import bgu.spl.mics.application.services.SellingService;
+import bgu.spl.mics.application.services.TimeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
@@ -19,6 +21,8 @@ public class BookStoreRunner {
 
     private static Inventory _inventory;            //represents the inventory of the store
     private static ResourcesHolder _resources;      //hold the resources of the store as vehicles
+    private static TimeService _timeService;        //time service
+    private static ArrayList<Runnable> _servicesToRun;   //holds the tunnable services that will become a task to run as thread
 
     public static void main(String[] args) {
 
@@ -56,7 +60,7 @@ private static void readJsonFile(String filePath) {
         //create Inventory object
         createInventory(jsonStream.get("initialInventory"));        //call for a method which init the inventory
         createResourcesHolder(jsonStream.get("initialResources"));
-
+        createServices(jsonStream.get("services"));
 
 
     } catch (Exception e) {
@@ -66,6 +70,65 @@ private static void readJsonFile(String filePath) {
 
 }
 
+    /**
+     * this method responsible for creating all of the store services that has been sent in the json execution file
+     * @param services  the received services
+     */
+    private static void createServices(Object services) {
+       LinkedHashMap<String,Object> castServices=(LinkedHashMap<String,Object>)services;
+       createTimeService(castServices.get("time"));
+       _servicesToRun=new ArrayList<>();            //init the runable services list
+       createSellingServices(castServices.get("selling"));  //create the required selling Services
+        createInventoryServices(castServices.get("inventoryService"));  //create the required inventory Services
+        createLogisticsServices(castServices.get("logistics"));  //create the required logistics Services
+        createResourcesServices(castServices.get("resourcesService"));  //create the required resourcesService Services
+
+
+    }
+
+    /**
+     * create time service
+     * @param time the received time data to initialize with
+     */
+    private static void createTimeService(Object time) {
+        LinkedHashMap<String,Object>timeCast;
+        timeCast= (LinkedHashMap<String,Object>)time;
+        int speed=(int)timeCast.get("speed");
+        int duration=(int)timeCast.get("duration");
+        _timeService=new TimeService(speed,duration);
+    }
+//////////////////those are methods to create runnable services////////////////////////////////////
+    private static void createSellingServices(Object selling){
+        int numOfSellingServices=(int)selling;
+        for(int i=0;i<numOfSellingServices;i++){
+            Runnable service=new SellingService("selling"+(i+1));
+            _servicesToRun.add(service);
+        }
+    }
+
+    private static void createInventoryServices(Object inventory){
+        int numOfInventoryServices=(int)inventory;
+        for(int i=0;i<numOfInventoryServices;i++){
+            Runnable service=new SellingService("inventory"+(i+1));
+            _servicesToRun.add(service);
+        }
+    }
+
+    private static void createLogisticsServices(Object logistic){
+        int numOfInventoryServices=(int)logistic;
+        for(int i=0;i<numOfInventoryServices;i++){
+            Runnable service=new SellingService("logistics"+(i+1));
+            _servicesToRun.add(service);
+        }
+    }
+    private static void createResourcesServices(Object resource){
+        int numOfInventoryServices=(int)resource;
+        for(int i=0;i<numOfInventoryServices;i++){
+            Runnable service=new SellingService("resources"+(i+1));
+            _servicesToRun.add(service);
+        }
+    }
+/////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * initialize the inventory
      * @param initialInventory the received initialInventory object
