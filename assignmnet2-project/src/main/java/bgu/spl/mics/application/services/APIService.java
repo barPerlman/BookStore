@@ -33,26 +33,33 @@ public class APIService extends MicroService{
 		this.orderSchedule.sort(Comparator.comparing(OrderPair::getStartTick));
 	}
 
+	/**
+	 * A protected function that initializes the APIService.
+	 */
 	@Override
 	protected void initialize() {
-		subscribeBroadcast(TerminateBroadcast.class, c -> {
+		// when TerminateBroadcast is received then the APIService should be terminated
+		subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast -> {
 			this.terminate();
 		});
 
-		subscribeBroadcast(TickBroadcast.class,c -> {
+		// when TickBroadcast is received then the APIService should complete all the matching orders
+		subscribeBroadcast(TickBroadcast.class,tickBroadcast -> {
 			for(int i=0;i<orderSchedule.size(); i++){
-				if(c.getCurrTick()==orderSchedule.get(i).getStartTick()) {
-
+				// if the current book should be ordered in this current tick time
+				if(tickBroadcast.getCurrTick()==orderSchedule.get(i).getStartTick()) {
 					Future<Integer> orderTick = sendEvent(new CurrTickEvent());
 					Integer orderTickTime = orderTick.get(1, TimeUnit.MILLISECONDS);
-
 					Future<OrderReceipt> future = sendEvent(new BookOrderEvent(orderSchedule.get(i).getNameBook(),this.customer,orderTickTime));
+
+					// checking if the order was made
 					if(future.get(1, TimeUnit.MILLISECONDS)!=null){
 						OrderReceipt orderReceipt = new OrderReceipt(future.get());
 						this.customer.addReceipt(orderReceipt);
 					}
 				}
-				else if(orderSchedule.get(i).getStartTick()>c.getCurrTick())
+				// if startTime of the current order bigger than the current time then stop the loop
+				else if(orderSchedule.get(i).getStartTick()>tickBroadcast.getCurrTick())
 					break;
 			}
 		});

@@ -24,14 +24,18 @@ public class ResourceService extends MicroService{
 	private ResourcesHolder resourcesHolder;
 
 	public ResourceService(String name) {
-		super(name);
+		super("ResourceService: "+name);
 		this.resourcesHolder = ResourcesHolder.getInstance();
 	}
 
+	/**
+	 * A protected function that initializes the ResourceService.
+	 */
 	protected void initialize() {
+		// when ResourceServiceEvent is received then the ResourceService should react
 		this.subscribeEvent(ResourceServiceEvent.class, deliveryMessage-> {
 			Future<DeliveryVehicle> futureDeliveryVehicle =	this.resourcesHolder.acquireVehicle();
-			DeliveryVehicle deliveryVehicle = futureDeliveryVehicle.get(); /// with time or without????
+			DeliveryVehicle deliveryVehicle = futureDeliveryVehicle.get();
 			deliveryVehicle.deliver(deliveryMessage.getDeliveryMessage().getAddress(), deliveryMessage.getDeliveryMessage().getDistance());
 			this.resourcesHolder.releaseVehicle(deliveryVehicle);
 		});
