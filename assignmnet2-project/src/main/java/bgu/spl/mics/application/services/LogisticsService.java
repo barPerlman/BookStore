@@ -18,6 +18,7 @@ import bgu.spl.mics.application.passiveObjects.Inventory;
 public class LogisticsService extends MicroService {
 
     public LogisticsService(String name) {
+
         super("LogisticsService: " +name);
     }
 
@@ -30,6 +31,7 @@ public class LogisticsService extends MicroService {
         // when DeliveryEvent is received then the LogisticsService should react
         this.subscribeEvent(DeliveryEvent.class, deliveryEvent -> {
             DeliveryEvent d = new DeliveryEvent(deliveryEvent.getOrderReceipt(),deliveryEvent.getDistance(),deliveryEvent.getAddress());
+
             sendEvent(new ResourceServiceEvent(d));
         });
     }

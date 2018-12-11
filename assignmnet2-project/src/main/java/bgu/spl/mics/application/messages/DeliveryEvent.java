@@ -2,6 +2,7 @@ package bgu.spl.mics.application.messages;
 import bgu.spl.mics.Event;
 import bgu.spl.mics.application.passiveObjects.OrderReceipt;
 
+
 /**
  * An event that is sent when the sells men of the store wishes to deliver the book that was bought
  */
@@ -14,6 +15,7 @@ public class DeliveryEvent implements Event {
         this.receipt = receipt;
         this.distance = distance;
         this.address = address;
+
     }
 
     public int getDistance() {
@@ -21,7 +23,9 @@ public class DeliveryEvent implements Event {
     }
 
     public OrderReceipt getOrderReceipt() {
+
         return receipt;
+
     }
 
     public String getAddress() {

@@ -24,6 +24,7 @@ public class ResourceService extends MicroService{
 	private ResourcesHolder resourcesHolder;
 
 	public ResourceService(String name) {
+
 		super("ResourceService: "+name);
 		this.resourcesHolder = ResourcesHolder.getInstance();
 	}
@@ -36,6 +37,7 @@ public class ResourceService extends MicroService{
 		this.subscribeEvent(ResourceServiceEvent.class, deliveryMessage-> {
 			Future<DeliveryVehicle> futureDeliveryVehicle =	this.resourcesHolder.acquireVehicle();
 			DeliveryVehicle deliveryVehicle = futureDeliveryVehicle.get();
+
 			deliveryVehicle.deliver(deliveryMessage.getDeliveryMessage().getAddress(), deliveryMessage.getDeliveryMessage().getDistance());
 			this.resourcesHolder.releaseVehicle(deliveryVehicle);
 		});

@@ -24,12 +24,15 @@ public class SellingService extends MicroService{
 	private MoneyRegister moneyRegister;
 	private int orderId=1; // in order to keep truck on the receipts' ids
 
+
 	public SellingService(String name) {
 		super("SellingService: "+name);
+
 		this.moneyRegister = MoneyRegister.getInstance();
 	}
 
 	/**
+
 	 * A protected function that initializes the SellingService.
 	 */
 	protected void initialize() {
@@ -79,6 +82,7 @@ public class SellingService extends MicroService{
 
 	/**
 	 * A private function that setts all the receipt's details.
+
 	 */
 	private void setReceipt(OrderReceipt receipt, BookOrderEvent details, int processTickTime, int issuedTickTime, int price){
 		receipt.setBookTitle(details.getBookName());

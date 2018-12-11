@@ -9,12 +9,14 @@ public class BookOrderEvent implements Event {
 
     private String bookName;
     private Customer customer;
+
     private int tickTime;
 
     public BookOrderEvent(String bookName, Customer customer, int tickTime){
         this.bookName = bookName;
         this.customer = customer;
         this.tickTime = tickTime;
+
     }
 
     public String getBookName() {
@@ -26,6 +28,8 @@ public class BookOrderEvent implements Event {
     }
 
     public int getOrderTickTime() {
+
         return this.tickTime;
+
     }
 }

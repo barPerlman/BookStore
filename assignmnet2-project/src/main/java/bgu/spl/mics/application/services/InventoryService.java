@@ -28,14 +28,18 @@ public class InventoryService extends MicroService{
 		this.inventory=Inventory.getInstance();
 	}
 
+
 	/**
 	 * A protected function that initializes the InventoryService.
 	 */
 	protected void initialize() {
 		// when TerminateBroadcast is received then the InventoryService should be terminated
 		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
+
 			this.terminate();
 		});
+	}
+
 
 		// when CheckBookEvent is received then the InventoryService should react
 		this.subscribeEvent(CheckBookEvent.class, checkBookEvent -> {
@@ -50,12 +54,17 @@ public class InventoryService extends MicroService{
 				}
 				else// if the book is in stuck
 					complete(checkBookEvent, price);
+
 			}
 			// if the book doesn't exist or the price of the book is bigger then the money that left
 			else
+
 				complete(checkBookEvent, null);
+
 		});
+
 
 		//System.out.println("Inventory service: "+this.getName()+" is initialized");
 	}
+
 }
