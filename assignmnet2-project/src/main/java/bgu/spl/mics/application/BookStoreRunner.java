@@ -68,10 +68,10 @@ private static void readJsonFile(String filePath) {
 
             LinkedHashMap<String,Object> internMap=inventoryArr.get(i);
 
-            for(int j=0;j<internMap.size();j++){
                 String bookTitle=(String) internMap.get("bookTitle");
                 int amount=(int)internMap.get("amount");
-                System.out.println(bookTitle+","+amount);
+                int price=(int)internMap.get("price");
+                System.out.println(bookTitle+","+amount+","+price);
 
             }
         }
@@ -80,4 +80,3 @@ private static void readJsonFile(String filePath) {
     }
 
 
-}
