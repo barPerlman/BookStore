@@ -1,14 +1,15 @@
 package bgu.spl.mics.application.messages;
 
-public class ResourceServiceEvent {
+import bgu.spl.mics.Event;
 
-    private DeliveryEvent deliveryEvent;
+public class ResourceServiceEvent implements Event {
+    private DeliveryEvent deliveryMessage;
 
     public ResourceServiceEvent(DeliveryEvent deliveryEvent){
-        this.deliveryEvent=deliveryEvent;
+        this.deliveryMessage = deliveryEvent;
     }
 
-    public DeliveryEvent getDeliveryEvent() {
-        return deliveryEvent;
+    public DeliveryEvent getDeliveryMessage() {
+        return deliveryMessage;
     }
 }

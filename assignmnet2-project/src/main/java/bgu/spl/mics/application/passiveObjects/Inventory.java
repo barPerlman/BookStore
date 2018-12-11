@@ -2,13 +2,10 @@ package bgu.spl.mics.application.passiveObjects;
 
 
 
-import org.junit.Test;
-
-import java.io.*;
-import java.util.HashMap;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -24,23 +21,24 @@ import static org.junit.Assert.assertEquals;
 public class Inventory {
 
 	private static ConcurrentHashMap<String,BookInventoryInfo> booksInventoryInfo;
-	private static Inventory instance =null;
-
-
-	private Inventory(){
-		booksInventoryInfo = new ConcurrentHashMap<>();
+	/**
+	 * The following is a thread safe singleton definition by a static class
+	 */
+	private static class InventoryHolder {
+		private static final Inventory INSTANCE = new Inventory();
 	}
 
 	/**
+	 * private constructor as part of the thread safe singleton
+	 */
+	private Inventory(){
+		booksInventoryInfo=(new ConcurrentHashMap<>());
+	}
+	/**
 	 * Retrieves the single instance of this class.
 	 */
-
 	public static Inventory getInstance() {
-		if(instance==null){
-			instance=new Inventory();
-		}
-		return instance;
-	}
+		return InventoryHolder.INSTANCE;	}
 	
 	/**
      * Initializes the store inventory. This method adds all the items given to the store

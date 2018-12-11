@@ -15,19 +15,19 @@ import bgu.spl.mics.application.passiveObjects.Inventory;
  * You can add private fields and public methods to this class.
  * You MAY change constructor signatures and even add new public constructors.
  */
-/*
 public class LogisticsService extends MicroService {
 
-	public LogisticsService() {
-		super("Change_This_Name");
-	}
+    public LogisticsService(String name) {
+        super(name);
+    }
 
-	@Override
-	protected void initialize() {
-		System.out.println("Service " + getName() + " started");
-		this.subscribeEvent(DeliveryEvent.class, cDeliveryEvent -> {// sends an event to resources, no references,
-			sendEvent(new ResourceServiceEvent,cDeliveryEvent
-		});
-	}
+    @Override
+    protected void initialize() {
+        System.out.println("Service " + getName() + " started");
+        this.subscribeEvent(DeliveryEvent.class, deliveryMessage -> {// sends an event to resources, no references,
+            DeliveryEvent d = new DeliveryEvent(deliveryMessage.getOrderReceipt(), deliveryMessage.getAddress(), deliveryMessage.getDistance());
+            sendEvent(new ResourceServiceEvent(d));
+        });
+    }
 
-}*/
+}
