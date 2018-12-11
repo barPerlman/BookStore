@@ -1,11 +1,7 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.application.passiveObjects.BookInventoryInfo;
-import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
-import bgu.spl.mics.application.passiveObjects.Inventory;
-import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
-import bgu.spl.mics.application.services.SellingService;
-import bgu.spl.mics.application.services.TimeService;
+import bgu.spl.mics.application.passiveObjects.*;
+import bgu.spl.mics.application.services.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
@@ -82,8 +78,47 @@ private static void readJsonFile(String filePath) {
         createInventoryServices(castServices.get("inventoryService"));  //create the required inventory Services
         createLogisticsServices(castServices.get("logistics"));  //create the required logistics Services
         createResourcesServices(castServices.get("resourcesService"));  //create the required resourcesService Services
+        createApiServices(castServices.get("customers"));
 
 
+    }
+
+    /**
+     * create the API services
+     * @param customers each item of customers is argument for the web api constructor
+     */
+    private static void createApiServices(Object customers){
+        ArrayList<LinkedHashMap<String,Object>> customersCast;
+        customersCast=(ArrayList<LinkedHashMap<String,Object>>)customers;   //cast the 'customers' to its original type
+        for(int i=0;i<customersCast.size();i++){                            //get the api services's arguments
+
+            //get the customer i details
+            LinkedHashMap<String,Object> internMap=customersCast.get(i);    //current service data
+            int id=(int)internMap.get("id");
+            String name=(String)internMap.get("name");
+            String address=(String)internMap.get("address");
+            int distance=(int)internMap.get("distance");
+            //get the object consist the credit card details
+            LinkedHashMap<String,Object> creditCardDetails=(LinkedHashMap<String,Object>)internMap.get("creditCard");
+            int cNumber=(int)creditCardDetails.get("number");
+            int availAmount=(int)creditCardDetails.get("amount");
+            //get the object consist the order schedule details
+            ArrayList<LinkedHashMap<String,Object>> orderSchedule=(ArrayList<LinkedHashMap<String,Object>>)internMap.get("orderSchedule");
+            ArrayList<OrderPair> orderScheduleList=new ArrayList<>();   //list of orderSchedule for api service constructor
+            //manipulate the order schedule data
+            for(int j=0;j<orderSchedule.size();j++){    //create order pairs and add them to list. will be sent to the api constructor
+                LinkedHashMap<String,Object> internOrder=orderSchedule.get(j);  //current order schedule data
+                String bookTitle=(String)internOrder.get("bookTitle");
+                Integer startTick=(Integer)internOrder.get("tick");
+                OrderPair orderPair=new OrderPair(bookTitle,startTick); //create order pair
+                orderScheduleList.add(orderPair);   //add the pair to order list
+            }
+            //build the customer from the data above
+            Customer custom=new Customer(id,name,address,distance,cNumber,availAmount);
+            //send all processed arguments to the web api constructor and create it
+            Runnable service=new APIService(custom,orderScheduleList);
+            _servicesToRun.add(service);
+        }
     }
 
     /**
@@ -97,7 +132,7 @@ private static void readJsonFile(String filePath) {
         int duration=(int)timeCast.get("duration");
         _timeService=new TimeService(speed,duration);
     }
-//////////////////those are methods to create runnable services////////////////////////////////////
+//////////////////those are methods to create runnable store services////////////////////////////////////
     private static void createSellingServices(Object selling){
         int numOfSellingServices=(int)selling;
         for(int i=0;i<numOfSellingServices;i++){
@@ -109,7 +144,7 @@ private static void readJsonFile(String filePath) {
     private static void createInventoryServices(Object inventory){
         int numOfInventoryServices=(int)inventory;
         for(int i=0;i<numOfInventoryServices;i++){
-            Runnable service=new SellingService("inventory"+(i+1));
+            Runnable service=new InventoryService("inventory"+(i+1));
             _servicesToRun.add(service);
         }
     }
@@ -117,14 +152,14 @@ private static void readJsonFile(String filePath) {
     private static void createLogisticsServices(Object logistic){
         int numOfInventoryServices=(int)logistic;
         for(int i=0;i<numOfInventoryServices;i++){
-            Runnable service=new SellingService("logistics"+(i+1));
+            Runnable service=new LogisticsService("logistics"+(i+1));
             _servicesToRun.add(service);
         }
     }
     private static void createResourcesServices(Object resource){
         int numOfInventoryServices=(int)resource;
         for(int i=0;i<numOfInventoryServices;i++){
-            Runnable service=new SellingService("resources"+(i+1));
+            Runnable service=new ResourceService("resources"+(i+1));
             _servicesToRun.add(service);
         }
     }
