@@ -1,17 +1,7 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.application.passiveObjects.Inventory;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicReference;
-
-import bgu.spl.mics.MicroService;
 
 /**
  * The {@link MessageBusImpl class is the implementation of the MessageBus interface.
@@ -170,7 +160,7 @@ public class MessageBusImpl implements MessageBus {
 			synchronized (_microServiceTypeHT.get(m)){	//lock on the messages queue of m
 				while(_microServiceTypeHT.get(m).isEmpty()){	//the messages queue is empty
 					try{
-						wait();		//wait till there will be messages
+						_microServiceTypeHT.get(m).wait();		//wait till there will be messages
 					}
 					catch (InterruptedException e){
 						if (Thread.currentThread().isInterrupted()) {

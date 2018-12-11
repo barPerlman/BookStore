@@ -49,4 +49,8 @@ public class DeliveryVehicle {
 			Thread.currentThread().interrupt();
 		}
 	}
+	/*	////for tests only! remove before submission!!!
+	public String toString(){
+		return "license: "+_license+", speed: "+_speed;
+	}*/
 }
