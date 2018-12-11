@@ -24,85 +24,61 @@ public class SellingService extends MicroService{
 	private MoneyRegister moneyRegister;
 	private int orderId=1; // in order to keep truck on the receipts' ids
 
-	/**
-	 * SellingService's constructor.
-	 *
-	 * @param name - the name of the sellingService.
-	 */
 	public SellingService(String name) {
-		super(name);
+		super("SellingService: "+name);
 		this.moneyRegister = MoneyRegister.getInstance();
 	}
 
 	/**
-	 * This method initializes the sellingService.
+	 * A protected function that initializes the SellingService.
 	 */
 	protected void initialize() {
-		terminateService();
-		orderBook();
-		System.out.println("Selling service: "+this.getName()+" is initialized");
-	}
-
-	/**
-	 * This method makes sure that the sellingService terminates itself
-	 * when StopTickBroadcast is received.
-	 */
-	private void terminateService(){
+		// when TerminateBroadcast is received then the SellingService should be terminated
 		this.subscribeBroadcast(TerminateBroadcast.class, terminateTick->{
 			this.terminate();
 		});
-	}
 
-	/**
-	 * This method makes sure that the sellingService terminates itself
-	 * when StopTickBroadcast is received.
-	 */
-	private void orderBook() {
-		this.subscribeEvent(BookOrderEvent.class, details -> {
-			// Initializing the time in which the selling service started processing the order
+		// when BookOrderEvent is received then the SellingService should react
+		this.subscribeEvent(BookOrderEvent.class, bookOrderEvent -> {
+			OrderReceipt receipt = new OrderReceipt();
+
+			// Creates new Future with the time that the selling service started processing his order
 			Future<Integer> processTick = sendEvent(new CurrTickEvent());
 			Integer processTickTime = processTick.get(1, TimeUnit.MILLISECONDS);
 
-			// Saving the price the customer paid for the book, this price is returned from TakeBookEvent
-			Future<Integer> takeBook = sendEvent(new CheckBookEvent(details.getBookName(), details.getCustomer().getAvailableCreditAmount()));
+			// Creates new Future with the name of the book and the money that left to the customer
+			Future<Integer> takeBook = sendEvent(new CheckBookEvent(bookOrderEvent.getBookName(), bookOrderEvent.getCustomer().getAvailableCreditAmount()));
 			Integer price = takeBook.get(1, TimeUnit.MILLISECONDS);
 
-			// Initializing a new receipt for this order
-			OrderReceipt receipt = new OrderReceipt();
-
-			// If the book was taking successfully,
-			// i.e. the customer can afford the book and there's an available copy of the book
+			// if the book is available in the store
 			if (price != null) {
-				// Charging the customer for the book
-				this.moneyRegister.chargeCreditCard(details.getCustomer(), price);
+				this.moneyRegister.chargeCreditCard(bookOrderEvent.getCustomer(), price);
 
-				// Initializing the time in which this receipt was issued
+				// Creates new Future with the time that this receipt issued
 				Future<Integer> issuedTick = sendEvent(new CurrTickEvent());
 				Integer issuedTickTime = issuedTick.get(1, TimeUnit.MILLISECONDS);
 
-				// Setting all of the receipt's details/information
-				setReceipt(receipt, details, processTickTime, issuedTickTime, price);
-				// Adding the receipt to list of receipts in moneyRegister
+				setReceipt(receipt, bookOrderEvent, processTickTime, issuedTickTime, price);
+
 				moneyRegister.file(receipt);
-				complete(details, receipt);
-				// Ordering a delivery of the book
-				sendEvent(new DeliveryEvent(receipt, details.getCustomer().getAddress(), details.getCustomer().getDistance()));
-				System.out.println("The customer: " + details.getCustomer().getName() + " bought the book: " + details.getBookName());
-			} else {
-				complete(details, receipt);
-				System.out.println("The order " + details.getCustomer().getName() + " made failed.");
+				complete(bookOrderEvent, receipt);
+
+				// Creates new DeliveryEvent of the book
+				sendEvent(new DeliveryEvent(receipt, bookOrderEvent.getCustomer().getDistance(), bookOrderEvent.getCustomer().getAddress()));
+				//System.out.println("The customer: " + bookOrderEvent.getCustomer().getName() + " bought the book: " + details.getBookName());
+			}
+			// if the book is not available in the store
+			else {
+				complete(bookOrderEvent, receipt);
+				//System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " made failed.");
 			}
 		});
+
+		//System.out.println("Selling service: "+this.getName()+" is initialized");
 	}
 
 	/**
-	 * This method setts all of the given receipt's details/information with the other parameters.
-	 *
-	 * @param receipt - the receipt that is being set.
-	 * @param details - a BookOrderEvent.
-	 * @param processTickTime - the time in which the selling service started processing the order.
-	 * @param issuedTickTime - the time in which this receipt was issued.
-	 * @param price - the price of the book that was bought.
+	 * A private function that setts all the receipt's details.
 	 */
 	private void setReceipt(OrderReceipt receipt, BookOrderEvent details, int processTickTime, int issuedTickTime, int price){
 		receipt.setBookTitle(details.getBookName());
