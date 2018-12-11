@@ -18,14 +18,20 @@ import bgu.spl.mics.application.passiveObjects.Inventory;
 public class LogisticsService extends MicroService {
 
     public LogisticsService(String name) {
-        super(name);
+
+        super("LogisticsService: " +name);
     }
 
+    /**
+     * A protected function that initializes the LogisticsService.
+     */
     @Override
     protected void initialize() {
-        System.out.println("Service " + getName() + " started");
-        this.subscribeEvent(DeliveryEvent.class, deliveryMessage -> {// sends an event to resources, no references,
-            DeliveryEvent d = new DeliveryEvent(deliveryMessage.getOrderReceipt(), deliveryMessage.getAddress(), deliveryMessage.getDistance());
+        //System.out.println("Service " + getName() + " started");
+        // when DeliveryEvent is received then the LogisticsService should react
+        this.subscribeEvent(DeliveryEvent.class, deliveryEvent -> {
+            DeliveryEvent d = new DeliveryEvent(deliveryEvent.getOrderReceipt(),deliveryEvent.getDistance(),deliveryEvent.getAddress());
+
             sendEvent(new ResourceServiceEvent(d));
         });
     }

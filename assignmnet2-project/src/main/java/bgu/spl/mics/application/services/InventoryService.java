@@ -27,39 +27,44 @@ public class InventoryService extends MicroService{
 		super(name);
 		this.inventory=Inventory.getInstance();
 	}
-	/**
-	 * This method initializes the sellingService.
-	 */
-	protected void initialize() {
-		terminateService();
-		takeBook();
-		System.out.println("Inventory service: "+this.getName()+" is initialized");
-	}
+
 
 	/**
-	 * This method makes sure that the InventoryService terminates itself
-	 * when StopTickBroadcast is received.
+	 * A protected function that initializes the InventoryService.
 	 */
-	private void terminateService(){
-		this.subscribeBroadcast(TerminateBroadcast.class, terminateTick->{
+	protected void initialize() {
+		// when TerminateBroadcast is received then the InventoryService should be terminated
+		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
+
 			this.terminate();
 		});
 	}
 
-	private void takeBook(){
-		this.subscribeEvent(CheckBookEvent.class, details -> {
-			int price = this.inventory.checkAvailabiltyAndGetPrice(details.getBookName());
-			if (price!=-1 && price <= details.getAvailableCreditAmount()){
-				OrderResult orderResult = this.inventory.take(details.getBookName());
+
+		// when CheckBookEvent is received then the InventoryService should react
+		this.subscribeEvent(CheckBookEvent.class, checkBookEvent -> {
+			int price = this.inventory.checkAvailabiltyAndGetPrice(checkBookEvent.getBookName());
+
+			// if the book is exist and the price of the book is lower then the money that left
+			if (price!=-1 && price <= checkBookEvent.getAvailableCreditAmount()){
+				OrderResult orderResult = this.inventory.take(checkBookEvent.getBookName());
+				//if the book is not in stuck
 				if (orderResult == OrderResult.NOT_IN_STOCK){
-					System.out.println("The book: "+details.getBookName()+" is not in stock");
+					System.out.println("The book: "+checkBookEvent.getBookName()+" is not in stock");
 				}
-				else
-					complete(details, price);
+				else// if the book is in stuck
+					complete(checkBookEvent, price);
+
 			}
+			// if the book doesn't exist or the price of the book is bigger then the money that left
 			else
-				complete(details, null);
+
+				complete(checkBookEvent, null);
+
 		});
+
+
+		//System.out.println("Inventory service: "+this.getName()+" is initialized");
 	}
 
 }

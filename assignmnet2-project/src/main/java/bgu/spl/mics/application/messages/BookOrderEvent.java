@@ -2,16 +2,21 @@ package bgu.spl.mics.application.messages;
 import bgu.spl.mics.Event;
 import bgu.spl.mics.application.passiveObjects.Customer;
 
+/**
+ * An event that is sent when a client of the store wishes to buy a book.
+ */
 public class BookOrderEvent implements Event {
 
     private String bookName;
     private Customer customer;
-    private int orderTickTime;
 
-    public BookOrderEvent(String bookName, Customer customer, int orderTickTime){
+    private int tickTime;
+
+    public BookOrderEvent(String bookName, Customer customer, int tickTime){
         this.bookName = bookName;
         this.customer = customer;
-        this.orderTickTime = orderTickTime;
+        this.tickTime = tickTime;
+
     }
 
     public String getBookName() {
@@ -23,6 +28,8 @@ public class BookOrderEvent implements Event {
     }
 
     public int getOrderTickTime() {
-        return this.orderTickTime;
+
+        return this.tickTime;
+
     }
 }
