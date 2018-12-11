@@ -51,4 +51,8 @@ public class BookInventoryInfo {
 	public int getPrice() {
 		return this.price;
 	}
+
+	public String toString(){
+		return "title: "+bookTitle+", amount: "+amountInInventory+", price: "+price;
+	}
 }
