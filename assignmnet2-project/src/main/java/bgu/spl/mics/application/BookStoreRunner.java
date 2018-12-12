@@ -34,14 +34,13 @@ public class BookStoreRunner {
             System.out.println("not all required files are received as arguments!");
             System.exit(0);
         }
-        System.out.println("got the file as argument");
 
         //create the money Register
         _moneyRegister=MoneyRegister.getInstance();
         //read the json file
         readJsonFile(args[0]);
 
-       /* _runThreads=new ArrayList<>();      //init thread list
+        _runThreads=new ArrayList<>();      //init thread list
         for(int i=0;i<_servicesToRun.size();i++){
             Thread thread=new Thread(_servicesToRun.get(i));
             _runThreads.add(thread);
@@ -58,7 +57,7 @@ public class BookStoreRunner {
         }
 
 
-*/
+
 
        outputToFiles(args[1],args[2],args[3],args[4]);
 
@@ -105,7 +104,6 @@ private static void readJsonFile(String filePath) {
 
     try {
         jsonStream=map.readValue(new File(filePath),mapType);   //get the json object into the map object
-        System.out.println(jsonStream);
         //create Inventory object
         createInventory(jsonStream.get("initialInventory"));        //call for a method which init the inventory
         createResourcesHolder(jsonStream.get("initialResources"));

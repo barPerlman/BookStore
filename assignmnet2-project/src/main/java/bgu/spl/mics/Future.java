@@ -12,15 +12,14 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class Future<T> {
 	//@INV: this!=null
-	private Object _lock;	//lock object for get functions
 	private boolean _isResolved;	//tells if this Future object is resolved-true,else-false
 	private AtomicReference<T> _result;    //holds the result of the associated operation
 	/**
 	 * This should be the only public constructor in this class.
 	 */
 	public Future() {
-		_lock=new Object();     //init the lock object
 		_result=new AtomicReference<>(null);    //init the result as not resolved
+		_isResolved=false;
 	}
 
 	/**
@@ -32,17 +31,18 @@ public class Future<T> {
 	 *
 	 */
 	//@PRE: result!=null
-	public T get() {
-		synchronized (_lock) {
-			while (!isDone()) {                //as long as the Future object is not resolved (Precondition blocking) block continuing
+	public synchronized T get() {
+			while (_result==null) {                //as long as the Future object is not resolved (Precondition blocking) block continuing
 				try {
-					_lock.wait();
+					this.wait();
+
 				} catch (InterruptedException ignore) {
 					Thread.currentThread().interrupt();
 				}
 			}
+			this.notifyAll();				//notify the threads which are waiting for the result to be resolve
 			return _result.get();			//here the result is available
-		}
+
 
 	}
 
@@ -54,14 +54,15 @@ public class Future<T> {
 	public void resolve (T result) {
 		//assign the result in a thread safe manner
 		T localResult;
-		T newResult=result;
+		T newResult;
 		do{
 			localResult=this._result.get();
 			newResult=result;
-		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
-		_isResolved=true;			//update the status of the future object to resolved
-		_lock.notifyAll();				//notify the threads which are waiting for the result to be resolve
 
+		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
+		if(_result.get()!=null) {
+			_isResolved = true;            //update the status of the future object to resolved
+		}
 	}
 
 	/**
@@ -85,16 +86,17 @@ public class Future<T> {
 	 */
 	//@PRE: @param timeout>0 @param unit!=null
 	public T get(long timeout, TimeUnit unit) {
-		try{
-			synchronized (_lock) {
+
 				while (!isDone()) {                          //result is not resolved
-					_lock.wait(unit.toMillis(timeout));   //here the thread will wait timeout amount of time in this's waiting list
-					break;                                  //after the sleep go out and return null
+					try {
+						unit.sleep(timeout);   //here the thread will wait timeout amount of time in this's waiting list
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
+				return _result.get();
 			}
-		}catch(InterruptedException ignore){            //return
-			Thread.currentThread().interrupt();
-		}
-		return _result.get();
-	}
+
+
+
 }

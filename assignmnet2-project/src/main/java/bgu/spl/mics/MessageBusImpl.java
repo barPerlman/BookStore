@@ -58,7 +58,7 @@ public class MessageBusImpl implements MessageBus {
 
 		//get the relevant queue to subscribe (insert the micro service as subscriber)
 		_messageTypeHT.putIfAbsent(type, new LinkedBlockingQueue<MicroService>());	//verify there will be object to lock on
-		synchronized(_messageTypeHT.get(type.getClass())) {	//lock the relevant queue for the micro service to subscribe only
+		synchronized(_messageTypeHT.get(type)) {	//lock the relevant queue for the micro service to subscribe only
 			//init the queue in case the type has no subscribers
 			subscribeMicroService(type, m);	//subscribe the micro service to the event type
 
@@ -68,8 +68,8 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-		_messageTypeHT.putIfAbsent(type, new LinkedBlockingQueue<MicroService>());	//verify there will be object to lock on
-		synchronized (_messageTypeHT.get(type.getClass())) {	//lock the relevant queue for the micro service to subscribe only
+		_messageTypeHT.putIfAbsent(type, new LinkedBlockingQueue<>());	//verify there will be object to lock on
+		synchronized (_messageTypeHT.get(type)) {	//lock the relevant queue for the micro service to subscribe only
 			//init the queue in case the type has no subscribers
 			subscribeMicroService(type, m);	//subscribe the micro service to the Broadcast Type
 
@@ -81,7 +81,8 @@ public class MessageBusImpl implements MessageBus {
 
 		synchronized (_lockerForFuturePairs) {
 			//resolve the future associated to the event e
-			_eventToFuture.get(e).resolve(result);    //resolve the associated future with the result
+			Future f=_eventToFuture.get(e);//.resolve(result);    //resolve the associated future with the result
+			f.resolve(result);
 			//here we didn't remove the event and its future from the table although this data unnacassary anymore cause delete in a not bi-directional list cost O(n)
 		}
 	}
@@ -92,8 +93,10 @@ public class MessageBusImpl implements MessageBus {
 		LinkedBlockingQueue<MicroService> microsSubscribedTo_b = _messageTypeHT.get(b.getClass());
 
 		//add the b message to the messages list of each micro service which is subscribed to b
-		for(MicroService currMicro:microsSubscribedTo_b){
-			_microServiceTypeHT.get(currMicro).add(b);   //insert the broadcast message to all subscribers
+		if(microsSubscribedTo_b!=null) {
+			for (MicroService currMicro : microsSubscribedTo_b) {
+				_microServiceTypeHT.get(currMicro).add(b);   //insert the broadcast message to all subscribers
+			}
 		}
 
 	}
@@ -114,6 +117,7 @@ public class MessageBusImpl implements MessageBus {
 			//insert the Event e with its future to the HashTable of events with their messages
 			_eventToFuture.putIfAbsent(e,future);
 			//the same with MS
+			_microServiceToFuture.putIfAbsent(nextMSToGet_e,new LinkedBlockingQueue<>());
 			_microServiceToFuture.get(nextMSToGet_e).add(future);
 
 			//put the event in the right micro service messages queue
@@ -129,7 +133,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void register(MicroService m) {
 
-		_microServiceTypeHT.putIfAbsent(m,new LinkedBlockingQueue<>(null));
+		_microServiceTypeHT.putIfAbsent(m,new LinkedBlockingQueue<>());
 
 	}
 
@@ -138,8 +142,10 @@ public class MessageBusImpl implements MessageBus {
 	public synchronized void unregister(MicroService m) {
 			//resolve the micro service futures to null (not resolved)
 			LinkedBlockingQueue<Future> futuresToNull= _microServiceToFuture.get(m);
-			for(Future f: futuresToNull){
-				f.resolve(null);
+			if(futuresToNull!=null) {
+				for (Future f : futuresToNull) {
+					f.resolve(null);
+				}
 			}
 			//clear from hash tables
 		for(Class<? extends Message> messageType:_messageTypeHT.keySet()){
@@ -187,7 +193,7 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	private void subscribeMicroService(Class<? extends Message> type, MicroService m) {
 		try {
-			_messageTypeHT.get(type.getClass()).put(m);    //add m as subscriber to the type of message
+			_messageTypeHT.get(type).put(m);    //add m as subscriber to the type of message
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
