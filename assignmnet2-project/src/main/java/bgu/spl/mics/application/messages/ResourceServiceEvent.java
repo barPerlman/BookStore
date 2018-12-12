@@ -6,11 +6,10 @@ import bgu.spl.mics.Event;
 /**
  * An event that is sent when the logisticService wishes to deliver the book
  */
-public class ResourceServiceEvent implements Event {
 
 
 public class ResourceServiceEvent implements Event {
-    private DeliveryEvent deliveryMessage;
+    private DeliveryEvent deliveryEvent;
 
     public ResourceServiceEvent(DeliveryEvent deliveryEvent){
 

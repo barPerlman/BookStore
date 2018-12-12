@@ -1,14 +1,12 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.BookOrderEvent;
 import bgu.spl.mics.application.messages.CheckBookEvent;
 import bgu.spl.mics.application.messages.TerminateBroadcast;
 import bgu.spl.mics.application.passiveObjects.Inventory;
+import bgu.spl.mics.application.passiveObjects.MoneyRegister;
 import bgu.spl.mics.application.passiveObjects.OrderResult;
 import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
-import bgu.spl.mics.application.passiveObjects.MoneyRegister;
-import com.sun.org.apache.xpath.internal.operations.Or;
 
 /**
  * InventoryService is in charge of the book inventory and stock.
@@ -35,11 +33,8 @@ public class InventoryService extends MicroService{
 	protected void initialize() {
 		// when TerminateBroadcast is received then the InventoryService should be terminated
 		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
-
 			this.terminate();
 		});
-	}
-
 
 		// when CheckBookEvent is received then the InventoryService should react
 		this.subscribeEvent(CheckBookEvent.class, checkBookEvent -> {
@@ -48,22 +43,19 @@ public class InventoryService extends MicroService{
 			// if the book is exist and the price of the book is lower then the money that left
 			if (price!=-1 && price <= checkBookEvent.getAvailableCreditAmount()){
 				OrderResult orderResult = this.inventory.take(checkBookEvent.getBookName());
+
 				//if the book is not in stuck
 				if (orderResult == OrderResult.NOT_IN_STOCK){
 					System.out.println("The book: "+checkBookEvent.getBookName()+" is not in stock");
 				}
 				else// if the book is in stuck
 					complete(checkBookEvent, price);
-
 			}
 			// if the book doesn't exist or the price of the book is bigger then the money that left
 			else
-
 				complete(checkBookEvent, null);
 
 		});
-
-
 		//System.out.println("Inventory service: "+this.getName()+" is initialized");
 	}
 

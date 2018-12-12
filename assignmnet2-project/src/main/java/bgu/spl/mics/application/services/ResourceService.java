@@ -2,14 +2,11 @@ package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.DeliveryEvent;
 import bgu.spl.mics.application.messages.ResourceServiceEvent;
 import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
-import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
-
-import java.util.concurrent.TimeUnit;
+import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
 
 /**
  * ResourceService is in charge of the store resources - the delivery vehicles.

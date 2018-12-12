@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Passive object representing the store finance management. 
@@ -87,7 +85,8 @@ public class MoneyRegister implements Serializable {
 			FileOutputStream fos =new FileOutputStream(filename);
 			ObjectOutputStream oos=new ObjectOutputStream(fos);
 			oos.writeObject(_issuedOrderReceipts);
-		}catch(IOException ignore){
+		}catch(IOException e){
+			e.printStackTrace();
 		}
 
 	}

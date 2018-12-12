@@ -6,7 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 /** This is the Main class of the application. You should parse the input file,
@@ -19,30 +23,79 @@ public class BookStoreRunner {
     private static ResourcesHolder _resources;      //hold the resources of the store as vehicles
     private static TimeService _timeService;        //time service
     private static ArrayList<Runnable> _servicesToRun;   //holds the tunnable services that will become a task to run as thread
+    private static ArrayList<Thread> _runThreads;       //services as threads
+    private static HashMap<Integer,Customer> _customerRefsHM;   //hash map with key id and value is the customers in store references.
+    private static MoneyRegister _moneyRegister;    //get the instance of the money register
 
     public static void main(String[] args) {
 
-
-
-
-
-        if(args.length!=1||args[0] == null)             //change length!=5
+        if(args.length!=5||args[0] == null)             //change length!=5
         {
             System.out.println("not all required files are received as arguments!");
             System.exit(0);
         }
         System.out.println("got the file as argument");
 
-
-
-
-
+        //create the money Register
+        _moneyRegister=MoneyRegister.getInstance();
         //read the json file
         readJsonFile(args[0]);
+
+       /* _runThreads=new ArrayList<>();      //init thread list
+        for(int i=0;i<_servicesToRun.size();i++){
+            Thread thread=new Thread(_servicesToRun.get(i));
+            _runThreads.add(thread);
+            thread.start();
+        }
+        _timeService.run();     //run time service after all services are up
+        //wait till all of the threads are finished
+        for(int i=0;i<_runThreads.size();i++){
+            try {
+                _runThreads.get(i).join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+*/
+
+       outputToFiles(args[1],args[2],args[3],args[4]);
+
+
+    }
+
+
+private static void outputToFiles(String customerFile,String booksFile,String receiptsFile,String moneyRegObjectFile){
+
+        //create a customer file with hash map of customers
+    try{
+        FileOutputStream fos =new FileOutputStream(customerFile);
+        ObjectOutputStream oos=new ObjectOutputStream(fos);
+        oos.writeObject(_customerRefsHM);
+    }catch(IOException e){
+        e.printStackTrace();
+    }
+
+
+    //create the books in inventory status file
+    _inventory.printInventoryToFile(booksFile);
+
+    //create the order receipts file
+    _moneyRegister.printOrderReceipts(receiptsFile);
+
+    //print the moneyRegister object to a file
+    try{
+        FileOutputStream fos =new FileOutputStream(moneyRegObjectFile);
+        ObjectOutputStream oos=new ObjectOutputStream(fos);
+        oos.writeObject(_moneyRegister);
+    }catch(IOException e){
+        e.printStackTrace();
     }
 
 
 
+}
 
 private static void readJsonFile(String filePath) {
 
@@ -113,8 +166,11 @@ private static void readJsonFile(String filePath) {
                 OrderPair orderPair=new OrderPair(bookTitle,startTick); //create order pair
                 orderScheduleList.add(orderPair);   //add the pair to order list
             }
+            _customerRefsHM=new HashMap<>();    //initialize the customers in store hashmap
             //build the customer from the data above
             Customer custom=new Customer(id,name,address,distance,cNumber,availAmount);
+            //add the customer to the hash map of customers
+            _customerRefsHM.putIfAbsent(new Integer(id),custom);
             //send all processed arguments to the web api constructor and create it
             Runnable service=new APIService(custom,orderScheduleList);
             _servicesToRun.add(service);

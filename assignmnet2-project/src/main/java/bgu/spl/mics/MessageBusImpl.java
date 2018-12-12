@@ -15,9 +15,9 @@ public class MessageBusImpl implements MessageBus {
 	//hash table with message type key to point on queue of subscribed microServices
 	private ConcurrentHashMap<Class<? extends Message>, LinkedBlockingQueue<MicroService>> _messageTypeHT;
 	//hash table with micro service type key to point on queue of micro Services's aimed messages
-	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Class<? extends Message>>> _microServiceTypeHT;
+	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Message>> _microServiceTypeHT;
 	//hash table which associates between event to its Future object
-	private ConcurrentHashMap<Class<? extends Event>, Future > _eventToFuture;
+	private ConcurrentHashMap<Event, Future > _eventToFuture;
 
 	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Future>> _microServiceToFuture;
 
@@ -32,10 +32,10 @@ public class MessageBusImpl implements MessageBus {
 	//private constructor
 	private MessageBusImpl() {
 		//init the hashTables
-		_messageTypeHT = new ConcurrentHashMap<Class<? extends Message>, LinkedBlockingQueue<MicroService>>();
-		_microServiceTypeHT = new ConcurrentHashMap<MicroService, LinkedBlockingQueue<Class<? extends Message>>>();
-		_eventToFuture = new ConcurrentHashMap<Class<? extends Event>, Future>();
-		_microServiceToFuture = new ConcurrentHashMap<MicroService, LinkedBlockingQueue<Future>>();
+		_messageTypeHT = new ConcurrentHashMap<>();
+		_microServiceTypeHT = new ConcurrentHashMap<>();
+		_eventToFuture = new ConcurrentHashMap<>();
+		_microServiceToFuture = new ConcurrentHashMap<>();
 		_lockerForFuturePairs=new Object();
 	}
 
@@ -93,7 +93,7 @@ public class MessageBusImpl implements MessageBus {
 
 		//add the b message to the messages list of each micro service which is subscribed to b
 		for(MicroService currMicro:microsSubscribedTo_b){
-			_microServiceTypeHT.get(currMicro).add(b.getClass());   //insert the broadcast message to all subscribers
+			_microServiceTypeHT.get(currMicro).add(b);   //insert the broadcast message to all subscribers
 		}
 
 	}
@@ -112,12 +112,12 @@ public class MessageBusImpl implements MessageBus {
 			Future<T> future=new Future<>();	//create a future to associate with the event
 
 			//insert the Event e with its future to the HashTable of events with their messages
-			_eventToFuture.putIfAbsent(e.getClass(),future);
+			_eventToFuture.putIfAbsent(e,future);
 			//the same with MS
 			_microServiceToFuture.get(nextMSToGet_e).add(future);
 
 			//put the event in the right micro service messages queue
-			_microServiceTypeHT.get(nextMSToGet_e).add(e.getClass());
+			_microServiceTypeHT.get(nextMSToGet_e).add(e);
 
 			//add the micro service back to the tail of the queue for round robin consistency
 			subscribersTo_e.add(nextMSToGet_e);
@@ -153,6 +153,9 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
 
+		return _microServiceTypeHT.get(m).take();
+
+		/*
 		if(_microServiceTypeHT.get(m)==null){		//in case m was never registered
 			throw new IllegalStateException();
 		}
@@ -174,6 +177,7 @@ public class MessageBusImpl implements MessageBus {
 				return msgFromQueue;
 			}
 		}
+		*/
 	}
 
 	/**
