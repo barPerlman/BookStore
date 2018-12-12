@@ -143,6 +143,7 @@ private static void readJsonFile(String filePath) {
     private static void createApiServices(Object customers){
         ArrayList<LinkedHashMap<String,Object>> customersCast;
         customersCast=(ArrayList<LinkedHashMap<String,Object>>)customers;   //cast the 'customers' to its original type
+        _customerRefsHM=new HashMap<>();    //initialize the customers in store hashmap
         for(int i=0;i<customersCast.size();i++){                            //get the api services's arguments
 
             //get the customer i details
@@ -166,7 +167,7 @@ private static void readJsonFile(String filePath) {
                 OrderPair orderPair=new OrderPair(bookTitle,startTick); //create order pair
                 orderScheduleList.add(orderPair);   //add the pair to order list
             }
-            _customerRefsHM=new HashMap<>();    //initialize the customers in store hashmap
+
             //build the customer from the data above
             Customer custom=new Customer(id,name,address,distance,cNumber,availAmount);
             //add the customer to the hash map of customers

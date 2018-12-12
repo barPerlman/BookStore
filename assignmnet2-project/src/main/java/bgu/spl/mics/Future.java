@@ -60,7 +60,7 @@ public class Future<T> {
 			newResult=result;
 		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
 		_isResolved=true;			//update the status of the future object to resolved
-		//_lock.notifyAll();				//notify the threads which are waiting for the result to be resolve
+		_lock.notifyAll();				//notify the threads which are waiting for the result to be resolve
 
 	}
 
