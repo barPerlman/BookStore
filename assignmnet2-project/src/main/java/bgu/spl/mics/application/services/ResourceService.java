@@ -32,11 +32,15 @@ public class ResourceService extends MicroService{
 	protected void initialize() {
 		// when ResourceServiceEvent is received then the ResourceService should react
 		this.subscribeEvent(ResourceServiceEvent.class, deliveryMessage-> {
-			Future<DeliveryVehicle> futureDeliveryVehicle =	this.resourcesHolder.acquireVehicle();
-			DeliveryVehicle deliveryVehicle = futureDeliveryVehicle.get();
+			Future<DeliveryVehicle> futureDeliveryVehicle = this.resourcesHolder.acquireVehicle();
+			if (futureDeliveryVehicle != null) {
+				DeliveryVehicle deliveryVehicle = futureDeliveryVehicle.get();
+				if (deliveryVehicle != null) {
+					deliveryVehicle.deliver(deliveryMessage.getDeliveryMessage().getAddress(), deliveryMessage.getDeliveryMessage().getDistance());
+					this.resourcesHolder.releaseVehicle(deliveryVehicle);
+				}
+			}
 
-			deliveryVehicle.deliver(deliveryMessage.getDeliveryMessage().getAddress(), deliveryMessage.getDeliveryMessage().getDistance());
-			this.resourcesHolder.releaseVehicle(deliveryVehicle);
 		});
 	}
 

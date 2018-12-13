@@ -21,7 +21,9 @@ public class MessageBusImpl implements MessageBus {
 
 	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Future>> _microServiceToFuture;
 
-	private Object _lockerForFuturePairs;
+	private final Object _lockerForFuturePairs=new Object();
+
+	private final Object _lockForUnRegister=new Object();
 
 	/**
 	 * the followings are methods for implementation of the thread safe singleton
@@ -36,7 +38,6 @@ public class MessageBusImpl implements MessageBus {
 		_microServiceTypeHT = new ConcurrentHashMap<>();
 		_eventToFuture = new ConcurrentHashMap<>();
 		_microServiceToFuture = new ConcurrentHashMap<>();
-		_lockerForFuturePairs=new Object();
 	}
 
 	private static class Holder {
@@ -57,8 +58,9 @@ public class MessageBusImpl implements MessageBus {
 
 
 		//get the relevant queue to subscribe (insert the micro service as subscriber)
-		_messageTypeHT.putIfAbsent(type, new LinkedBlockingQueue<MicroService>());	//verify there will be object to lock on
-		synchronized(_messageTypeHT.get(type)) {	//lock the relevant queue for the micro service to subscribe only
+
+		synchronized(_lockForUnRegister) {	//lock the relevant queue for the micro service to subscribe only
+			_messageTypeHT.putIfAbsent(type, new LinkedBlockingQueue<MicroService>());	//verify there will be object to lock on
 			//init the queue in case the type has no subscribers
 			subscribeMicroService(type, m);	//subscribe the micro service to the event type
 
@@ -69,17 +71,17 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
 		_messageTypeHT.putIfAbsent(type, new LinkedBlockingQueue<>());	//verify there will be object to lock on
-		synchronized (_messageTypeHT.get(type)) {	//lock the relevant queue for the micro service to subscribe only
+		//synchronized (_messageTypeHT.get(type)) {	//lock the relevant queue for the micro service to subscribe only
 			//init the queue in case the type has no subscribers
 			subscribeMicroService(type, m);	//subscribe the micro service to the Broadcast Type
 
-		}
+		//}
 	}
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
 
-			synchronized (_eventToFuture.get(e)) {
+			synchronized (_lockerForFuturePairs) {
 				//resolve the future associated to the event e
 				Future f = _eventToFuture.get(e);//.resolve(result);    //resolve the associated future with the result
 				f.resolve(result);
@@ -110,11 +112,12 @@ public class MessageBusImpl implements MessageBus {
 			return null;
 		}
 		else{	//there's at least 1 service which is subscribed to this event
-			synchronized (_messageTypeHT.get(e.getClass())) {
+			synchronized (_lockForUnRegister) {
+				synchronized (_lockerForFuturePairs) {
 				Future<T> future = new Future<>();    //create a future to associate with the event
 				//insert the Event e with its future to the HashTable of events with their messages
 				_eventToFuture.putIfAbsent(e, future);
-				synchronized (_eventToFuture.get(e)) {
+
 					//get the subscribers of the e event
 					LinkedBlockingQueue<MicroService> subscribersTo_e = _messageTypeHT.get(e.getClass());
 					MicroService nextMSToGet_e = subscribersTo_e.poll();    //get the head of the queue and remove it from list
@@ -145,19 +148,28 @@ public class MessageBusImpl implements MessageBus {
 
 
 	@Override
-	public synchronized void unregister(MicroService m) {
-			//resolve the micro service futures to null (not resolved)
-			LinkedBlockingQueue<Future> futuresToNull= _microServiceToFuture.get(m);
-		/*	if(futuresToNull!=null) {
-				for (Future f : futuresToNull) {
-					f.resolve(null);
-				}
-			}*/
-			//clear from hash tables
-		for(Class<? extends Message> messageType:_messageTypeHT.keySet()){
-			_messageTypeHT.remove(messageType,m);
+	public  void unregister(MicroService m) {
+		synchronized (_lockForUnRegister){
+			for(Class<? extends Message> messageType:_messageTypeHT.keySet()){
+				_messageTypeHT.get(messageType).remove(m);
+			}
 		}
+
 		_microServiceTypeHT.remove(m);
+			//resolve the micro service futures to null (not resolved)
+		synchronized (_lockerForFuturePairs){
+			LinkedBlockingQueue<Future> futuresToNull= _microServiceToFuture.get(m);
+			if(futuresToNull!=null) {
+				for (Future f : futuresToNull) {
+					if(f.isDone()==false) {
+						f.resolve(null);
+					}}
+				}
+			}
+		_microServiceToFuture.remove(m);
+			//clear from hash tables
+
+
 
 
 	}
@@ -176,11 +188,8 @@ public class MessageBusImpl implements MessageBus {
 	 * @param m		the micro service we would like to subscribe
 	 */
 	private void subscribeMicroService(Class<? extends Message> type, MicroService m) {
-		try {
-			_messageTypeHT.get(type).put(m);    //add m as subscriber to the type of message
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
+			_messageTypeHT.get(type).add(m);    //add m as subscriber to the type of message
+
 	}
 
 }
