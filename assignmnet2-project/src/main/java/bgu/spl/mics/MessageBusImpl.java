@@ -79,12 +79,13 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public <T> void complete(Event<T> e, T result) {
 
-		synchronized (_lockerForFuturePairs) {
-			//resolve the future associated to the event e
-			Future f=_eventToFuture.get(e);//.resolve(result);    //resolve the associated future with the result
-			f.resolve(result);
-			//here we didn't remove the event and its future from the table although this data unnacassary anymore cause delete in a not bi-directional list cost O(n)
-		}
+			synchronized (_eventToFuture.get(e)) {
+				//resolve the future associated to the event e
+				Future f = _eventToFuture.get(e);//.resolve(result);    //resolve the associated future with the result
+				f.resolve(result);
+				//here we didn't remove the event and its future from the table although this data unnacassary anymore cause delete in a not bi-directional list cost O(n)
+			}
+
 	}
 
 	@Override
@@ -104,29 +105,34 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
+
 		if(_messageTypeHT.get(e.getClass())==null){		//there's no micro service which is subscribed to handle this event
 			return null;
 		}
 		else{	//there's at least 1 service which is subscribed to this event
+			synchronized (_messageTypeHT.get(e.getClass())) {
+				Future<T> future = new Future<>();    //create a future to associate with the event
+				//insert the Event e with its future to the HashTable of events with their messages
+				_eventToFuture.putIfAbsent(e, future);
+				synchronized (_eventToFuture.get(e)) {
+					//get the subscribers of the e event
+					LinkedBlockingQueue<MicroService> subscribersTo_e = _messageTypeHT.get(e.getClass());
+					MicroService nextMSToGet_e = subscribersTo_e.poll();    //get the head of the queue and remove it from list
 
-			//get the subscribers of the e event
-			LinkedBlockingQueue<MicroService> subscribersTo_e=_messageTypeHT.get(e.getClass());
-			MicroService nextMSToGet_e=subscribersTo_e.poll();	//get the head of the queue and remove it from list
-			Future<T> future=new Future<>();	//create a future to associate with the event
+					//the same with MS
+					_microServiceToFuture.putIfAbsent(nextMSToGet_e, new LinkedBlockingQueue<>());
+					_microServiceToFuture.get(nextMSToGet_e).add(future);
 
-			//insert the Event e with its future to the HashTable of events with their messages
-			_eventToFuture.putIfAbsent(e,future);
-			//the same with MS
-			_microServiceToFuture.putIfAbsent(nextMSToGet_e,new LinkedBlockingQueue<>());
-			_microServiceToFuture.get(nextMSToGet_e).add(future);
+					//put the event in the right micro service messages queue
+					_microServiceTypeHT.putIfAbsent(nextMSToGet_e,new LinkedBlockingQueue<>());
+					_microServiceTypeHT.get(nextMSToGet_e).add(e);
 
-			//put the event in the right micro service messages queue
-			_microServiceTypeHT.get(nextMSToGet_e).add(e);
+					//add the micro service back to the tail of the queue for round robin consistency
+					subscribersTo_e.add(nextMSToGet_e);
 
-			//add the micro service back to the tail of the queue for round robin consistency
-			subscribersTo_e.add(nextMSToGet_e);
-
-			return future;
+					return future;
+				}
+			}
 		}
 	}
 
@@ -142,11 +148,11 @@ public class MessageBusImpl implements MessageBus {
 	public synchronized void unregister(MicroService m) {
 			//resolve the micro service futures to null (not resolved)
 			LinkedBlockingQueue<Future> futuresToNull= _microServiceToFuture.get(m);
-			if(futuresToNull!=null) {
+		/*	if(futuresToNull!=null) {
 				for (Future f : futuresToNull) {
 					f.resolve(null);
 				}
-			}
+			}*/
 			//clear from hash tables
 		for(Class<? extends Message> messageType:_messageTypeHT.keySet()){
 			_messageTypeHT.remove(messageType,m);
@@ -161,29 +167,7 @@ public class MessageBusImpl implements MessageBus {
 
 		return _microServiceTypeHT.get(m).take();
 
-		/*
-		if(_microServiceTypeHT.get(m)==null){		//in case m was never registered
-			throw new IllegalStateException();
-		}
-		else{
-			synchronized (_microServiceTypeHT.get(m)){	//lock on the messages queue of m
-				while(_microServiceTypeHT.get(m).isEmpty()){	//the messages queue is empty
-					try{
-						_microServiceTypeHT.get(m).wait();		//wait till there will be messages
-					}
-					catch (InterruptedException e){
-						if (Thread.currentThread().isInterrupted()) {
-							throw new InterruptedException();
-						}
-						Thread.currentThread().interrupt();
-					}
-				}
-				Message msgFromQueue=_microServiceTypeHT.get(m).poll().cast(Message.class);
-				notifyAll();
-				return msgFromQueue;
-			}
-		}
-		*/
+
 	}
 
 	/**
