@@ -21,13 +21,11 @@ import java.util.concurrent.TimeUnit;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class SellingService extends MicroService {
+    private int orderId = 1; // represents the id of the receipts
     private MoneyRegister moneyRegister;
-    private int orderId = 1; // in order to keep truck on the receipts' ids
-
 
     public SellingService(String name) {
         super("SellingService: " + name);
-
         this.moneyRegister = MoneyRegister.getInstance();
     }
 
@@ -42,13 +40,13 @@ public class SellingService extends MicroService {
 
         // when BookOrderEvent is received then the SellingService should react
         this.subscribeEvent(BookOrderEvent.class, bookOrderEvent -> {
-            OrderReceipt receipt = new OrderReceipt();
+            OrderReceipt orderReceipt = new OrderReceipt();
 
             // Creates new Future with the time that the selling service started processing his order
             Future<Integer> processTick = sendEvent(new CurrTickEvent());
             if (processTick != null) {
-                Integer processTickTime = processTick.get(1, TimeUnit.MILLISECONDS);
-                if (processTickTime != null) {
+                Integer tempProcessTick = processTick.get(1, TimeUnit.MILLISECONDS);
+                if (tempProcessTick != null) {
                     // Creates new Future with the name of the book and the money that left to the customer
                     Future<Integer> takeBook = sendEvent(new CheckBookEvent(bookOrderEvent.getBookName(), bookOrderEvent.getCustomer().getAvailableCreditAmount()));
                     if (takeBook != null) {
@@ -56,43 +54,38 @@ public class SellingService extends MicroService {
 
                         // if the book is available in the store
                         if (price != null) {
-
                             // Creates new Future with the time that this receipt issued
                             Future<Integer> issuedTick = sendEvent(new CurrTickEvent());
                             if (issuedTick != null) {
-
-                                Integer issuedTickTime = issuedTick.get(1, TimeUnit.MILLISECONDS);
-                                if (issuedTickTime != null) {
+                                Integer tempIssuedTick = issuedTick.get(1, TimeUnit.MILLISECONDS);
+                                if (tempIssuedTick != null) {
                                     this.moneyRegister.chargeCreditCard(bookOrderEvent.getCustomer(), price);
-
-                                    setReceipt(receipt, bookOrderEvent, processTickTime, issuedTickTime, price);
-
-                                    moneyRegister.file(receipt);
-                                    complete(bookOrderEvent, receipt);
-
+                                    updateReceipt(bookOrderEvent,orderReceipt,price,tempIssuedTick,tempProcessTick);
+                                    moneyRegister.file(orderReceipt);
+                                    complete(bookOrderEvent, orderReceipt);
                                     // Creates new DeliveryEvent of the book
-                                    sendEvent(new DeliveryEvent(receipt, bookOrderEvent.getCustomer().getDistance(), bookOrderEvent.getCustomer().getAddress()));
+                                    sendEvent(new DeliveryEvent(orderReceipt, bookOrderEvent.getCustomer().getDistance(), bookOrderEvent.getCustomer().getAddress()));
                                     //System.out.println("The customer: " + bookOrderEvent.getCustomer().getName() + " bought the book: " + details.getBookName());
                                 }
                                 // if the book is not available in the store
                                 else {
-                                    complete(bookOrderEvent, receipt);
+                                    complete(bookOrderEvent, orderReceipt);
                                     //System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " made failed.");
                                 }
                             }else{
-                                complete(bookOrderEvent, receipt);
+                                complete(bookOrderEvent, orderReceipt);
                             }
                         }else{
-                            complete(bookOrderEvent, receipt);
+                            complete(bookOrderEvent, orderReceipt);
                         }
                     }else{
-                        complete(bookOrderEvent, receipt);
+                        complete(bookOrderEvent, orderReceipt);
                     }
                 }else{
-                    complete(bookOrderEvent, receipt);
+                    complete(bookOrderEvent, orderReceipt);
                 }
             }else{
-                complete(bookOrderEvent, receipt);
+                complete(bookOrderEvent, orderReceipt);
             }
         });
 
@@ -102,15 +95,15 @@ public class SellingService extends MicroService {
     /**
      * A private function that setts all the receipt's details.
      */
-    private void setReceipt(OrderReceipt receipt, BookOrderEvent details, int processTickTime, int issuedTickTime, int price) {
-        receipt.setBookTitle(details.getBookName());
-        receipt.setCustomerId(details.getCustomer().getId());
-        receipt.setOrderTick(details.getOrderTickTime());
-        receipt.setSeller(this.getName());
-        receipt.setProccessTick(processTickTime);
-        receipt.setissuedTick(issuedTickTime);
-        receipt.setPrice(price);
-        receipt.setOrderId(this.orderId);
+    private void updateReceipt(BookOrderEvent bookOrderEvent,OrderReceipt orderReceipt,int price,int issuedTick,int processTick) {
+        orderReceipt.setSeller(this.getName());
+        orderReceipt.setOrderId(this.orderId);
         this.orderId++;
+        orderReceipt.setBookTitle(bookOrderEvent.getBookName());
+        orderReceipt.setCustomerId(bookOrderEvent.getCustomer().getId());
+        orderReceipt.setOrderTick(bookOrderEvent.getOrderTickTime());
+        orderReceipt.setPrice(price);
+        orderReceipt.setissuedTick(issuedTick);
+        orderReceipt.setProccessTick(processTick);
     }
 }
