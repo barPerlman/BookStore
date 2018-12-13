@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class Future<T> {
 	//@INV: this!=null
-	private boolean _isResolved;	//tells if this Future object is resolved-true,else-false
+	private boolean _isResolved=false;	//tells if this Future object is resolved-true,else-false
 	private AtomicReference<T> _result;    //holds the result of the associated operation
 	/**
 	 * This should be the only public constructor in this class.
@@ -40,7 +40,7 @@ public class Future<T> {
 					Thread.currentThread().interrupt();
 				}
 			}
-			this.notifyAll();				//notify the threads which are waiting for the result to be resolve
+			notifyAll();				//notify the threads which are waiting for the result to be resolve
 			return _result.get();			//here the result is available
 
 
@@ -58,11 +58,11 @@ public class Future<T> {
 		do{
 			localResult=this._result.get();
 			newResult=result;
+			//_isResolved = true;            //update the status of the future object to resolved
 
 		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
-		if(_result.get()!=null) {
-			_isResolved = true;            //update the status of the future object to resolved
-		}
+			_isResolved = true;
+
 	}
 
 	/**
@@ -90,6 +90,7 @@ public class Future<T> {
 				while (!isDone()) {                          //result is not resolved
 					try {
 						unit.sleep(timeout);   //here the thread will wait timeout amount of time in this's waiting list
+						//break;
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
