@@ -24,6 +24,7 @@ public class InventoryService extends MicroService{
 	public InventoryService(String name) {
 		super(name);
 		this.inventory=Inventory.getInstance();
+
 	}
 
 
@@ -34,7 +35,6 @@ public class InventoryService extends MicroService{
 		// when TerminateBroadcast is received then the InventoryService should be terminated
 		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
 			this.terminate();
-			System.out.println("service name: "+getName()+" terminated");
 
 		});
 

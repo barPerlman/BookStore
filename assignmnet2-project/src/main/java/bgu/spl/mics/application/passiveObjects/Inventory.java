@@ -21,12 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Inventory {
 
-	private static ConcurrentHashMap<String,BookInventoryInfo> booksInventoryInfo;
+	private ConcurrentHashMap<String,BookInventoryInfo> booksInventoryInfo;
 	/**
 	 * The following is a thread safe singleton definition by a static class
 	 */
 	private static class InventoryHolder {
-		private static final Inventory INSTANCE = new Inventory();
+		private static  Inventory INSTANCE = new Inventory();
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class Inventory {
      */
 	public int checkAvailabiltyAndGetPrice(String book) {
 		// if the book is exist in the pool and if the capacity of the book is up to 0
-		if(this.booksInventoryInfo.contains(book)&&this.booksInventoryInfo.get(book).getAmountInInventory()>0){
+		if(this.booksInventoryInfo.get(book)!=null&&this.booksInventoryInfo.get(book).getAmountInInventory()>0){
 			return this.booksInventoryInfo.get(book).getPrice();
 		}
 		else{// the book is not exist in the pool or it's capacity is 0

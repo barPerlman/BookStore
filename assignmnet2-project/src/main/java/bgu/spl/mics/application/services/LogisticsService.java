@@ -38,7 +38,6 @@ public class LogisticsService extends MicroService {
         // when TerminateBroadcast is received then the LogisticsService should be terminated
         this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
             this.terminate();
-            System.out.println("service name: "+getName()+" terminated");
 
         });
     }

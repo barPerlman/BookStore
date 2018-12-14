@@ -38,7 +38,6 @@ public class TimeService extends MicroService{
 		// when TerminateBroadcast is received then the TimeService should be terminated
 		subscribeBroadcast(TerminateBroadcast.class,terminateBroadcast -> {
 			this.terminate();
-			System.out.println("service name: "+getName()+" terminated");
 
 		});
 

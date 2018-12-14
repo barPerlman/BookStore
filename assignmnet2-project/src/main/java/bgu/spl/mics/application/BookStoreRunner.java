@@ -66,7 +66,6 @@ public class BookStoreRunner {
             e.printStackTrace();
         }
 
-        System.out.println("got here fuck you");
        outputToFiles(args[1],args[2],args[3],args[4]);
 
 
@@ -238,11 +237,15 @@ private static void readJsonFile(String filePath) {
     private static void createInventory(Object initialInventory) {
 
 
-        ArrayList<BookInventoryInfo> bookInventoryInfos=new ArrayList<>();  //get the books in its correct type bookInv info
         _inventory=Inventory.getInstance();     //get/create instance of Inventory
+
+
+        ArrayList<BookInventoryInfo> bookInventoryInfos=new ArrayList<>();  //get the books in its correct type bookInv info
+
         ArrayList<LinkedHashMap<String,Object>> inventoryArr;  //holds the books from read received object
 
         inventoryArr=(ArrayList<LinkedHashMap<String,Object>>)initialInventory; //cast back the initial inventory to its fit type
+
 
         for(int i=0;i<inventoryArr.size();i++){
            //for convenience
@@ -257,9 +260,7 @@ private static void readJsonFile(String filePath) {
             }
         BookInventoryInfo[] booksArr=new BookInventoryInfo[bookInventoryInfos.size()];   //get the BookInventoryInfo type arr for loading in inventory
         bookInventoryInfos.toArray(booksArr);   //convert the arrayList into array of BookInventoryInfo
-
         _inventory.load(booksArr);  //load all the books into the Inventory
-
         }
 
 

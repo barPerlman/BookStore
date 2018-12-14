@@ -48,7 +48,6 @@ public class ResourceService extends MicroService {
 		// when TerminateBroadcast is received then the ResourceService should be terminated
 		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast -> {
 			this.terminate();
-			System.out.println("service name: " + getName() + " terminated");
 
 		});
 

@@ -36,7 +36,6 @@ public class SellingService extends MicroService {
         // when TerminateBroadcast is received then the SellingService should be terminated
         this.subscribeBroadcast(TerminateBroadcast.class, terminateTick -> {
             this.terminate();
-            System.out.println("service name: "+getName()+" terminated");
 
         });
 
