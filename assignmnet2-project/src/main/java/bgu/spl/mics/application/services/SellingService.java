@@ -25,7 +25,7 @@ public class SellingService extends MicroService {
     private MoneyRegister moneyRegister;
 
     public SellingService(String name) {
-        super("SellingService: " + name);
+        super(name);
         this.moneyRegister = MoneyRegister.getInstance();
     }
 
@@ -36,6 +36,8 @@ public class SellingService extends MicroService {
         // when TerminateBroadcast is received then the SellingService should be terminated
         this.subscribeBroadcast(TerminateBroadcast.class, terminateTick -> {
             this.terminate();
+            System.out.println("service name: "+getName()+" terminated");
+
         });
 
         // when BookOrderEvent is received then the SellingService should react
@@ -48,9 +50,9 @@ public class SellingService extends MicroService {
                 Integer tempProcessTick = processTick.get(1, TimeUnit.MILLISECONDS);
                 if (tempProcessTick != null) {
                     // Creates new Future with the name of the book and the money that left to the customer
-                    Future<Integer> takeBook = sendEvent(new CheckBookEvent(bookOrderEvent.getBookName(), bookOrderEvent.getCustomer().getAvailableCreditAmount()));
-                    if (takeBook != null) {
-                        Integer price = takeBook.get(1, TimeUnit.MILLISECONDS);
+                    Future<Integer> checkBook = sendEvent(new CheckBookEvent(bookOrderEvent.getBookName(), bookOrderEvent.getCustomer().getAvailableCreditAmount()));
+                    if (checkBook != null) {
+                        Integer price = checkBook.get(1, TimeUnit.MILLISECONDS);
 
                         // if the book is available in the store
                         if (price != null) {
@@ -66,29 +68,17 @@ public class SellingService extends MicroService {
                                     // Creates new DeliveryEvent of the book
                                     sendEvent(new DeliveryEvent(orderReceipt, bookOrderEvent.getCustomer().getDistance(), bookOrderEvent.getCustomer().getAddress()));
                                     //System.out.println("The customer: " + bookOrderEvent.getCustomer().getName() + " bought the book: " + details.getBookName());
+                                    return;
                                 }
-                                // if the book is not available in the store
-                                else {
-                                    complete(bookOrderEvent, orderReceipt);
-                                    //System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " made failed.");
-                                }
-                            }else{
-                                complete(bookOrderEvent, orderReceipt);
+                                // System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " made failed.");
                             }
-                        }else{
-                            complete(bookOrderEvent, orderReceipt);
                         }
-                    }else{
-                        complete(bookOrderEvent, orderReceipt);
                     }
-                }else{
-                    complete(bookOrderEvent, orderReceipt);
                 }
-            }else{
-                complete(bookOrderEvent, orderReceipt);
             }
+            // if the book is not available in the store
+            complete(bookOrderEvent,null);
         });
-
         //System.out.println("Selling service: "+this.getName()+" is initialized");
     }
 

@@ -34,6 +34,8 @@ public class InventoryService extends MicroService{
 		// when TerminateBroadcast is received then the InventoryService should be terminated
 		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
 			this.terminate();
+			System.out.println("service name: "+getName()+" terminated");
+
 		});
 
 		// when CheckBookEvent is received then the InventoryService should react

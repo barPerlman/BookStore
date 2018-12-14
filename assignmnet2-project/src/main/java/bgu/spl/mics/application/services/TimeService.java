@@ -27,7 +27,7 @@ public class TimeService extends MicroService{
 	int duration;
 	int currTick;
 	public TimeService(int speed, int duration) {
-		super("TimeService");
+		super("time");
 		currTick=1;
 		this.speed=speed;
 		this.duration=duration;
@@ -38,6 +38,8 @@ public class TimeService extends MicroService{
 		// when TerminateBroadcast is received then the TimeService should be terminated
 		subscribeBroadcast(TerminateBroadcast.class,terminateBroadcast -> {
 			this.terminate();
+			System.out.println("service name: "+getName()+" terminated");
+
 		});
 
 		// when CurrTickEvent is received then the TimeService gets the current tick
@@ -46,7 +48,7 @@ public class TimeService extends MicroService{
 		});
 
 		// Defining the timer activation
-		timer = new Timer(speed,e ->{
+		timer = new Timer(speed,(e) ->{
 			currTick++;
 			///////////////System.out.println("The current tick is : "+currTick);
 			if(currTick==duration) {// if the duration time is over
@@ -55,11 +57,12 @@ public class TimeService extends MicroService{
 				this.sendBroadcast(new TerminateBroadcast(currTick));
 				timer.stop();// the duration is over so the timer needs to stop
 			}
-			else // if the duration time is not over
+			else {// if the duration time is not over
 				sendBroadcast(new TickBroadcast(currTick));
-
+			}
 			////////////////System.out.println("Services: "+this.getName()+" is terminated");
-			timer.start();
+
 		});
+		timer.start();
 	}
 }

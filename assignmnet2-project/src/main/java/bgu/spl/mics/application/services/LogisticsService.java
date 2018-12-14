@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.DeliveryEvent;
 import bgu.spl.mics.application.messages.ResourceServiceEvent;
+import bgu.spl.mics.application.messages.TerminateBroadcast;
 import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
 import bgu.spl.mics.application.passiveObjects.Inventory;
@@ -19,7 +20,7 @@ public class LogisticsService extends MicroService {
 
     public LogisticsService(String name) {
 
-        super("LogisticsService: " +name);
+        super(name);
     }
 
     /**
@@ -33,6 +34,12 @@ public class LogisticsService extends MicroService {
             DeliveryEvent d = new DeliveryEvent(deliveryEvent.getOrderReceipt(),deliveryEvent.getDistance(),deliveryEvent.getAddress());
 
             sendEvent(new ResourceServiceEvent(d));
+        });
+        // when TerminateBroadcast is received then the LogisticsService should be terminated
+        this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
+            this.terminate();
+            System.out.println("service name: "+getName()+" terminated");
+
         });
     }
 

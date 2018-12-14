@@ -29,7 +29,7 @@ public class BookStoreRunner {
 
     public static void main(String[] args) {
 
-        if(args.length!=5||args[0] == null)             //change length!=5
+        if(args.length<5||args[0] == null)             //change length!=5
         {
             System.out.println("not all required files are received as arguments!");
             System.exit(0);
@@ -40,13 +40,18 @@ public class BookStoreRunner {
         //read the json file
         readJsonFile(args[0]);
 
-        _runThreads=new ArrayList<>();      //init thread list
+       _runThreads=new ArrayList<>();      //init thread list
+
+
+
+
         for(int i=0;i<_servicesToRun.size();i++){
             Thread thread=new Thread(_servicesToRun.get(i));
             _runThreads.add(thread);
             thread.start();
         }
-        _timeService.run();     //run time service after all services are up
+        Thread t=new Thread(_timeService);     //run time service after all services are up
+        t.start();
         //wait till all of the threads are finished
         for(int i=0;i<_runThreads.size();i++){
             try {
@@ -55,10 +60,13 @@ public class BookStoreRunner {
                 e.printStackTrace();
             }
         }
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-
-
-
+        System.out.println("got here fuck you");
        outputToFiles(args[1],args[2],args[3],args[4]);
 
 
@@ -72,6 +80,8 @@ private static void outputToFiles(String customerFile,String booksFile,String re
         FileOutputStream fos =new FileOutputStream(customerFile);
         ObjectOutputStream oos=new ObjectOutputStream(fos);
         oos.writeObject(_customerRefsHM);
+        fos.close();
+        oos.close();
     }catch(IOException e){
         e.printStackTrace();
     }
@@ -88,6 +98,8 @@ private static void outputToFiles(String customerFile,String booksFile,String re
         FileOutputStream fos =new FileOutputStream(moneyRegObjectFile);
         ObjectOutputStream oos=new ObjectOutputStream(fos);
         oos.writeObject(_moneyRegister);
+        fos.close();
+        oos.close();
     }catch(IOException e){
         e.printStackTrace();
     }

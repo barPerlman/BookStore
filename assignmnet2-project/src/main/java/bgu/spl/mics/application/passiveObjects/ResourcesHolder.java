@@ -49,7 +49,7 @@ public class ResourcesHolder {		//in this class we use semaphore in aim to acqui
 		try {
 			_sem.acquire();
 		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
+			e.printStackTrace();
 		}
 		Future<DeliveryVehicle> future=new Future<>();	//in case the released amount of vehicles>=permits
 		future.resolve(_storedVehicles.poll());

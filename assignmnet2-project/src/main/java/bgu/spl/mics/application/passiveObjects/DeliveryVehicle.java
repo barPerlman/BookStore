@@ -46,7 +46,7 @@ public class DeliveryVehicle {
 			Thread.sleep(distance*_speed);		//suspend execution of current thread for (distance*speed) period
 
 		}catch(InterruptedException e){
-			Thread.currentThread().interrupt();
+			e.printStackTrace();
 		}
 	}
 	/*	////for tests only! remove before submission!!!

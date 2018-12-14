@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.ResourceServiceEvent;
+import bgu.spl.mics.application.messages.TerminateBroadcast;
 import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
@@ -17,12 +18,12 @@ import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
  * You can add private fields and public methods to this class.
  * You MAY change constructor signatures and even add new public constructors.
  */
-public class ResourceService extends MicroService{
+public class ResourceService extends MicroService {
 	private ResourcesHolder resourcesHolder;
 
 	public ResourceService(String name) {
 
-		super("ResourceService: "+name);
+		super(name);
 		this.resourcesHolder = ResourcesHolder.getInstance();
 	}
 
@@ -31,7 +32,7 @@ public class ResourceService extends MicroService{
 	 */
 	protected void initialize() {
 		// when ResourceServiceEvent is received then the ResourceService should react
-		this.subscribeEvent(ResourceServiceEvent.class, deliveryMessage-> {
+		this.subscribeEvent(ResourceServiceEvent.class, deliveryMessage -> {
 			Future<DeliveryVehicle> futureDeliveryVehicle = this.resourcesHolder.acquireVehicle();
 			if (futureDeliveryVehicle != null) {
 				DeliveryVehicle deliveryVehicle = futureDeliveryVehicle.get();
@@ -39,9 +40,17 @@ public class ResourceService extends MicroService{
 					deliveryVehicle.deliver(deliveryMessage.getDeliveryMessage().getAddress(), deliveryMessage.getDeliveryMessage().getDistance());
 					this.resourcesHolder.releaseVehicle(deliveryVehicle);
 				}
+
+
 			}
 
 		});
-	}
+		// when TerminateBroadcast is received then the ResourceService should be terminated
+		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast -> {
+			this.terminate();
+			System.out.println("service name: " + getName() + " terminated");
 
+		});
+
+	}
 }

@@ -27,7 +27,7 @@ public class APIService extends MicroService{
 	Customer customer;
 
 	public APIService(Customer customer,List<OrderPair> orderSchedule) {
-		super("APIService: "+customer.getName());
+		super(customer.getName());
 		this.customer=customer;
 		this.orderSchedule=orderSchedule;
 		this.orderSchedule.sort(Comparator.comparing(OrderPair::getStartTick));
@@ -41,6 +41,7 @@ public class APIService extends MicroService{
 		// when TerminateBroadcast is received then the APIService should be terminated
 		subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast -> {
 			this.terminate();
+			System.out.println("service name: "+getName()+" terminated");
 		});
 
 		// when TickBroadcast is received then the APIService should complete all the matching orders

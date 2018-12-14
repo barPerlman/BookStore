@@ -37,7 +37,6 @@ public class Future<T> {
 					this.wait();
 
 				} catch (InterruptedException ignore) {
-					Thread.currentThread().interrupt();
 				}
 			}
 			notifyAll();				//notify the threads which are waiting for the result to be resolve
@@ -90,7 +89,7 @@ public class Future<T> {
 				while (!isDone()) {                          //result is not resolved
 					try {
 						unit.sleep(timeout);   //here the thread will wait timeout amount of time in this's waiting list
-						//break;
+						break;
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
