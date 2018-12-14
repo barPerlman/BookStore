@@ -67,16 +67,10 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
-		// if the book is exist in the pool
-		// if the book is exist in the pool and if the capacity of the book is up to 0
-		if(this.booksInventoryInfo.contains(book)&&this.booksInventoryInfo.get(book).getAmountInInventory()>0){
-			int sum = this.booksInventoryInfo.get(book).getAmountInInventory();
-				this.booksInventoryInfo.get(book).setAmountInInventory(sum - 1);
-				return OrderResult.SUCCESSFULLY_TAKEN;
-		}
-		else{// the bis the book is not exist in the pool or it's capacity is 0
-			return  OrderResult.NOT_IN_STOCK;
-		}
+		BookInventoryInfo bookInventoryInfo = booksInventoryInfo.get(book);
+		if(bookInventoryInfo!=null && bookInventoryInfo.setAmountInInventory(bookInventoryInfo.getAmountInInventory()-1)==1)
+			return OrderResult.SUCCESSFULLY_TAKEN;
+		return OrderResult.NOT_IN_STOCK;
 	}
 
 	/**
