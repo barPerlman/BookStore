@@ -36,7 +36,6 @@ public class SellingService extends MicroService {
         // when TerminateBroadcast is received then the SellingService should be terminated
         this.subscribeBroadcast(TerminateBroadcast.class, terminateTick -> {
             this.terminate();
-
         });
 
         // when BookOrderEvent is received then the SellingService should react
@@ -46,19 +45,21 @@ public class SellingService extends MicroService {
             // Creates new Future with the time that the selling service started processing his order
             Future<Integer> processTick = sendEvent(new CurrTickEvent());
             if (processTick != null) {
-                Integer tempProcessTick = processTick.get(1, TimeUnit.MILLISECONDS);
+                Integer tempProcessTick = processTick.get(1, TimeUnit.SECONDS);
+                //System.out.println("cutrrTickTime Selling service :" +tempProcessTick);
                 if (tempProcessTick != null) {
                     // Creates new Future with the name of the book and the money that left to the customer
                     Future<Integer> checkBook = sendEvent(new CheckBookEvent(bookOrderEvent.getBookName(), bookOrderEvent.getCustomer().getAvailableCreditAmount()));
                     if (checkBook != null) {
-                        Integer price = checkBook.get(1, TimeUnit.MILLISECONDS);
+                        Integer price = checkBook.get(1, TimeUnit.SECONDS);
 
                         // if the book is available in the store
                         if (price != null) {
                             // Creates new Future with the time that this receipt issued
                             Future<Integer> issuedTick = sendEvent(new CurrTickEvent());
                             if (issuedTick != null) {
-                                Integer tempIssuedTick = issuedTick.get(1, TimeUnit.MILLISECONDS);
+                                Integer tempIssuedTick = issuedTick.get(1, TimeUnit.SECONDS);
+                                //System.out.println("TempIssuedTick is :" + tempIssuedTick);
                                 if (tempIssuedTick != null) {
                                     this.moneyRegister.chargeCreditCard(bookOrderEvent.getCustomer(), price);
                                     updateReceipt(bookOrderEvent,orderReceipt,price,tempIssuedTick,tempProcessTick);
@@ -66,10 +67,10 @@ public class SellingService extends MicroService {
                                     complete(bookOrderEvent, orderReceipt);
                                     // Creates new DeliveryEvent of the book
                                     sendEvent(new DeliveryEvent(orderReceipt, bookOrderEvent.getCustomer().getDistance(), bookOrderEvent.getCustomer().getAddress()));
-                                    //System.out.println("The customer: " + bookOrderEvent.getCustomer().getName() + " bought the book: " + details.getBookName());
+                                 //   System.out.println("The customer: " + bookOrderEvent.getCustomer().getName() + " bought the book: " + bookOrderEvent.getBookName());
                                     return;
                                 }
-                                // System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " made failed.");
+                                //System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " made failed.");
                             }
                         }
                     }

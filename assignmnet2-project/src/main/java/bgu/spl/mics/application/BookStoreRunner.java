@@ -5,14 +5,9 @@ import bgu.spl.mics.application.services.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
+
 /** This is the Main class of the application. You should parse the input file,
  * create the different instances of the objects, and run the system.
  * In the end, you should output serialized objects.
@@ -29,11 +24,12 @@ public class BookStoreRunner {
 
     public static void main(String[] args) {
 
-        if(args.length<5||args[0] == null)             //change length!=5
-        {
-            System.out.println("not all required files are received as arguments!");
-            System.exit(0);
-        }
+        //if(args.length<5||args[0] == null)             //change length!=5
+       // {
+       //     System.out.println("not all required files are received as arguments!");
+       //     System.exit(0);
+      //  }
+
 
         //create the money Register
         _moneyRegister=MoneyRegister.getInstance();
@@ -41,7 +37,6 @@ public class BookStoreRunner {
         readJsonFile(args[0]);
 
        _runThreads=new ArrayList<>();      //init thread list
-
 
 
 
@@ -65,12 +60,27 @@ public class BookStoreRunner {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
        outputToFiles(args[1],args[2],args[3],args[4]);
 
+        try {
+            List<OrderReceipt> or= getReceipts(args[3]);
+            System.out.println("amount of orders "+or.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
     }
-
+    private static List<OrderReceipt> getReceipts(String receiptsObj)
+            throws FileNotFoundException, IOException, ClassNotFoundException {
+        FileInputStream fileIn = new FileInputStream(receiptsObj);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+       List<OrderReceipt> receipts = (List<OrderReceipt>) in.readObject();
+        in.close();
+        fileIn.close();
+        return receipts;
+    }
 
 private static void outputToFiles(String customerFile,String booksFile,String receiptsFile,String moneyRegObjectFile){
 

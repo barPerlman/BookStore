@@ -49,7 +49,7 @@ public class TimeService extends MicroService{
 		// Defining the timer activation
 		timer = new Timer(speed,(e) ->{
 			currTick++;
-			///////////////System.out.println("The current tick is : "+currTick);
+			System.out.println("The current tick is : "+currTick);
 			if(currTick==duration) {// if the duration time is over
 				// timeService tells messageBus to tell all of the services that subscribed to him that
 				// terminates itself
@@ -59,8 +59,6 @@ public class TimeService extends MicroService{
 			else {// if the duration time is not over
 				sendBroadcast(new TickBroadcast(currTick));
 			}
-			////////////////System.out.println("Services: "+this.getName()+" is terminated");
-
 		});
 		timer.start();
 	}

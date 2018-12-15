@@ -28,11 +28,9 @@ public class LogisticsService extends MicroService {
      */
     @Override
     protected void initialize() {
-        //System.out.println("Service " + getName() + " started");
         // when DeliveryEvent is received then the LogisticsService should react
         this.subscribeEvent(DeliveryEvent.class, deliveryEvent -> {
             DeliveryEvent d = new DeliveryEvent(deliveryEvent.getOrderReceipt(),deliveryEvent.getDistance(),deliveryEvent.getAddress());
-
             sendEvent(new ResourceServiceEvent(d));
         });
         // when TerminateBroadcast is received then the LogisticsService should be terminated
@@ -40,6 +38,7 @@ public class LogisticsService extends MicroService {
             this.terminate();
 
         });
+       // System.out.println("Service " + getName() + " started");
     }
 
 }

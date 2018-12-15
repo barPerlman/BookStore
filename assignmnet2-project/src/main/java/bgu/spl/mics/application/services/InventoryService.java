@@ -52,11 +52,13 @@ public class InventoryService extends MicroService{
 				}
 				else// if the book is in stuck
 					complete(checkBookEvent, price);
+				//System.out.println("the book can be bought");
 			}
 			// if the book doesn't exist or the price of the book is bigger then the money that left
-			else
+			else {
+				//System.out.println("the book can't be bought");
 				complete(checkBookEvent, null);
-
+			}
 		});
 		//System.out.println("Inventory service: "+this.getName()+" is initialized");
 	}

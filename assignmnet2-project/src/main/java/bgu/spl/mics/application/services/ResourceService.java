@@ -40,16 +40,15 @@ public class ResourceService extends MicroService {
 					deliveryVehicle.deliver(deliveryMessage.getDeliveryMessage().getAddress(), deliveryMessage.getDeliveryMessage().getDistance());
 					this.resourcesHolder.releaseVehicle(deliveryVehicle);
 				}
-
-
 			}
-
 		});
 		// when TerminateBroadcast is received then the ResourceService should be terminated
 		this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast -> {
 			this.terminate();
 
 		});
+		//System.out.println("Resource Service: "+this.getName()+" is initialized");
+
 
 	}
 }
