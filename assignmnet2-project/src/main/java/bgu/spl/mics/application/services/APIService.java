@@ -53,10 +53,10 @@ public class APIService extends MicroService{
 					Future<OrderReceipt> future = sendEvent(new BookOrderEvent(orderSchedule.get(i).getNameBook(),this.customer,orderTickTime));
 
 					// checking if the order was made
-					if(future.get(1, TimeUnit.SECONDS)!=null){
+					if(future.get(1, TimeUnit.MILLISECONDS)!=null){
 						OrderReceipt orderReceipt = new OrderReceipt(future.get());
 						this.customer.addReceipt(orderReceipt);
-						System.out.println("receipt added for customer");
+						//System.out.println("receipt added for customer");
 					}
 				}
 				// if startTime of the current order bigger than the current time then stop the loop

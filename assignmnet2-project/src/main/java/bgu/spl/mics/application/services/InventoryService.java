@@ -48,7 +48,7 @@ public class InventoryService extends MicroService{
 
 				//if the book is not in stuck
 				if (orderResult == OrderResult.NOT_IN_STOCK){
-					System.out.println("The book: "+checkBookEvent.getBookName()+" is not in stock");
+					//System.out.println("The book: "+checkBookEvent.getBookName()+" is not in stock");
 				}
 				else// if the book is in stuck
 					complete(checkBookEvent, price);

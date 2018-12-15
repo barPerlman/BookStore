@@ -62,7 +62,7 @@ public class BookStoreRunner {
         }
        outputToFiles(args[1],args[2],args[3],args[4]);
 
-        try {
+      /*  try {
             List<OrderReceipt> or= getReceipts(args[3]);
             System.out.println("amount of orders "+or.size());
         } catch (IOException e) {
@@ -70,7 +70,7 @@ public class BookStoreRunner {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
+*/
     }
     private static List<OrderReceipt> getReceipts(String receiptsObj)
             throws FileNotFoundException, IOException, ClassNotFoundException {
