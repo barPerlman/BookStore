@@ -24,6 +24,8 @@ public class MoneyRegister implements Serializable {
 	//class members
 	private List<OrderReceipt> _issuedOrderReceipts;
 
+	private int _orderId=1;	//the id of the order to add to the list
+
 	/**
 	 * The following is a thread safe singleton definition by a static class
 	 */
@@ -49,7 +51,9 @@ public class MoneyRegister implements Serializable {
      * @param r		The receipt to save in the money register.
      */
 	public void file (OrderReceipt r) {
+		r.setOrderId(_orderId);
 		_issuedOrderReceipts.add(r);
+		_orderId++;
 	}
 	
 	/**

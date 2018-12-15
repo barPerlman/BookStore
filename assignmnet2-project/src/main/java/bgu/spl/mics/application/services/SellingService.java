@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class SellingService extends MicroService {
-    private int orderId = 1; // represents the id of the receipts
     private MoneyRegister moneyRegister;
 
     public SellingService(String name) {
@@ -87,8 +86,6 @@ public class SellingService extends MicroService {
      */
     private void updateReceipt(BookOrderEvent bookOrderEvent,OrderReceipt orderReceipt,int price,int issuedTick,int processTick) {
         orderReceipt.setSeller(this.getName());
-        orderReceipt.setOrderId(this.orderId);
-        this.orderId++;
         orderReceipt.setBookTitle(bookOrderEvent.getBookName());
         orderReceipt.setCustomerId(bookOrderEvent.getCustomer().getId());
         orderReceipt.setOrderTick(bookOrderEvent.getOrderTickTime());
