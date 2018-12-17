@@ -1,7 +1,6 @@
 package bgu.spl.mics;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 /**
  * A Future object represents a promised result - an object that will
  * eventually be resolved to hold a result of some operation. The class allows
@@ -13,12 +12,12 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Future<T> {
 	//@INV: this!=null
 	private boolean _isResolved=false;	//tells if this Future object is resolved-true,else-false
-	private AtomicReference<T> _result;    //holds the result of the associated operation
+	private T _result;    //holds the result of the associated operation
 	/**
 	 * This should be the only public constructor in this class.
 	 */
 	public Future() {
-		_result=new AtomicReference<>(null);    //init the result as not resolved
+		_result=null;   //init the result as not resolved
 		_isResolved=false;
 	}
 
@@ -32,17 +31,15 @@ public class Future<T> {
 	 */
 	//@PRE: result!=null
 	public synchronized T get() {
-			while (_result==null) {                //as long as the Future object is not resolved (Precondition blocking) block continuing
+			while (!_isResolved) {                //as long as the Future object is not resolved (Precondition blocking) block continuing
 				try {
 					this.wait();
 
 				} catch (InterruptedException ignore) {
 				}
 			}
-			notifyAll();				//notify the threads which are waiting for the result to be resolve
-			return _result.get();			//here the result is available
-
-
+			//notifyAll();				//notify the threads which are waiting for the result to be resolve
+			return _result;			//here the result is available
 	}
 
 	/**
@@ -50,18 +47,11 @@ public class Future<T> {
 	 */
 	//@PRE: none
 	//@POST: this.get()=@param result
-	public void resolve (T result) {
+	public synchronized void resolve (T result) {
 		//assign the result in a thread safe manner
-		T localResult;
-		T newResult;
-		do{
-			localResult=this._result.get();
-			newResult=result;
-			//_isResolved = true;            //update the status of the future object to resolved
-
-		}while(!this._result.compareAndSet(localResult,newResult));	//busy wait
-			_isResolved = true;
-
+		_isResolved=true;
+		this._result=result;
+		notify();
 	}
 
 	/**
@@ -85,18 +75,17 @@ public class Future<T> {
 	 */
 	//@PRE: @param timeout>0 @param unit!=null
 	public T get(long timeout, TimeUnit unit) {
-
-				while (!isDone()) {                          //result is not resolved
-					try {
-						unit.sleep(timeout);   //here the thread will wait timeout amount of time in this's waiting list
-						//break;
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+		int currSleepTime = 0;
+		if(!isDone()){
+			while (!isDone() && currSleepTime<=timeout) {                          //result is not resolved
+				try {
+					unit.sleep(1);   //here the thread will wait timeout amount of time in this's waiting list
+					currSleepTime++;
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				return _result.get();
 			}
-
-
-
+		}
+		return _result;
+	}
 }

@@ -4,6 +4,7 @@ import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.ResourceServiceEvent;
 import bgu.spl.mics.application.messages.TerminateBroadcast;
+import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
@@ -48,7 +49,8 @@ public class ResourceService extends MicroService {
 
 		});
 		//System.out.println("Resource Service: "+this.getName()+" is initialized");
-
+		this.subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
+		});
 
 	}
 }

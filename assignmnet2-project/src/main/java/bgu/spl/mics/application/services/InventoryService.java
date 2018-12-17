@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.CheckBookEvent;
 import bgu.spl.mics.application.messages.TerminateBroadcast;
+import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
 import bgu.spl.mics.application.passiveObjects.OrderResult;
@@ -38,6 +39,9 @@ public class InventoryService extends MicroService{
 
 		});
 
+		this.subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
+		});
+
 		// when CheckBookEvent is received then the InventoryService should react
 		this.subscribeEvent(CheckBookEvent.class, checkBookEvent -> {
 			int price = this.inventory.checkAvailabiltyAndGetPrice(checkBookEvent.getBookName());
@@ -48,15 +52,17 @@ public class InventoryService extends MicroService{
 
 				//if the book is not in stuck
 				if (orderResult == OrderResult.NOT_IN_STOCK){
+					complete(checkBookEvent,null);
 					//System.out.println("The book: "+checkBookEvent.getBookName()+" is not in stock");
 				}
-				else// if the book is in stuck
+				else{// if the book is in stuck
 					complete(checkBookEvent, price);
-				//System.out.println("the book can be bought");
+					//System.out.println("Inventory service:the book exist in Inventory");
+					}
 			}
 			// if the book doesn't exist or the price of the book is bigger then the money that left
 			else {
-				//System.out.println("the book can't be bought");
+				//System.out.println("Inventory service:the book doesn't exist in Inventory");
 				complete(checkBookEvent, null);
 			}
 		});

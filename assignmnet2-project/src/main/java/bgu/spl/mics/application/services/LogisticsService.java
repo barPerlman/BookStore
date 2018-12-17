@@ -4,6 +4,7 @@ import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.DeliveryEvent;
 import bgu.spl.mics.application.messages.ResourceServiceEvent;
 import bgu.spl.mics.application.messages.TerminateBroadcast;
+import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
 import bgu.spl.mics.application.passiveObjects.Inventory;
@@ -37,6 +38,9 @@ public class LogisticsService extends MicroService {
         this.subscribeBroadcast(TerminateBroadcast.class, terminateBroadcast->{
             this.terminate();
 
+        });
+
+        this.subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
         });
        // System.out.println("Service " + getName() + " started");
     }

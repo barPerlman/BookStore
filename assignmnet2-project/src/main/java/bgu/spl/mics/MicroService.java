@@ -162,13 +162,14 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        MessageBusImpl.getInstance().register(this);
-
         initialize();
+        MessageBusImpl.getInstance().register(this);
         while (!terminated) {
             try {
                 Message msg=MessageBusImpl.getInstance().awaitMessage(this);
-                callBacksMap.get(msg.getClass()).call(msg);
+                Callback c=callBacksMap.get(msg.getClass());
+                if(msg!=null && c!=null)
+                    c.call(msg);
             }
             catch (InterruptedException e){
                 System.out.println("Service "+this.name+" interrupted");
@@ -176,5 +177,4 @@ public abstract class MicroService implements Runnable {
         }
         MessageBusImpl.getInstance().unregister(this);
     }
-
 }

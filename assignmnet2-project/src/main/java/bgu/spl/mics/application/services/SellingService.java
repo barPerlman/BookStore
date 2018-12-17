@@ -3,12 +3,10 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.*;
+import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
 import bgu.spl.mics.application.passiveObjects.OrderReceipt;
 import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
-import bgu.spl.mics.application.passiveObjects.Inventory;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Selling service in charge of taking orders from customers.
@@ -22,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SellingService extends MicroService {
     private MoneyRegister moneyRegister;
+    private int currTick;
 
     public SellingService(String name) {
         super(name);
@@ -37,46 +36,36 @@ public class SellingService extends MicroService {
             this.terminate();
         });
 
+        this.subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
+            this.currTick=tickBroadcast.getCurrTick();
+        });
+
         // when BookOrderEvent is received then the SellingService should react
         this.subscribeEvent(BookOrderEvent.class, bookOrderEvent -> {
             OrderReceipt orderReceipt = new OrderReceipt();
-
-            // Creates new Future with the time that the selling service started processing his order
-            Future<Integer> processTick = sendEvent(new CurrTickEvent());
-            if (processTick != null) {
-                Integer tempProcessTick = processTick.get(1, TimeUnit.MILLISECONDS);
-               // System.out.println("cutrrTickTime Selling service :" +tempProcessTick);
-                if (tempProcessTick != null) {
-                    // Creates new Future with the name of the book and the money that left to the customer
-                    Future<Integer> checkBook = sendEvent(new CheckBookEvent(bookOrderEvent.getBookName(), bookOrderEvent.getCustomer().getAvailableCreditAmount()));
-                    if (checkBook != null) {
-                        Integer price = checkBook.get(1, TimeUnit.MILLISECONDS);
-
-                        // if the book is available in the store
-                        if (price != null) {
-                            // Creates new Future with the time that this receipt issued
-                            Future<Integer> issuedTick = sendEvent(new CurrTickEvent());
-                            if (issuedTick != null) {
-                                Integer tempIssuedTick = issuedTick.get(1, TimeUnit.MILLISECONDS);
-                                //System.out.println("TempIssuedTick is :" + tempIssuedTick);
-                                if (tempIssuedTick != null) {
-                                    this.moneyRegister.chargeCreditCard(bookOrderEvent.getCustomer(), price);
-                                    updateReceipt(bookOrderEvent,orderReceipt,price,tempIssuedTick,tempProcessTick);
-                                    moneyRegister.file(orderReceipt);
-                                    complete(bookOrderEvent, orderReceipt);
-                                    // Creates new DeliveryEvent of the book
-                                    sendEvent(new DeliveryEvent(orderReceipt, bookOrderEvent.getCustomer().getDistance(), bookOrderEvent.getCustomer().getAddress()));
-                                    //System.out.println("The customer: " + bookOrderEvent.getCustomer().getName() + " bought the book: " + bookOrderEvent.getBookName());
-                                    return;
-                                }
-                                //System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " made failed.");
-                            }
-                        }
-                    }
+            // Creates new Future with the name of the book and the money that left to the customer
+            Future<Integer> checkBook = sendEvent(new CheckBookEvent(bookOrderEvent.getBookName(), bookOrderEvent.getCustomer().getAvailableCreditAmount()));
+            if (checkBook != null) {
+                Integer price = checkBook.get();
+                // if the book is available in the store
+                if (price != null) {
+                        this.moneyRegister.chargeCreditCard(bookOrderEvent.getCustomer(), price);
+                        updateReceipt(bookOrderEvent,orderReceipt,price,this.currTick,this.currTick);
+                        moneyRegister.file(orderReceipt);
+                        complete(bookOrderEvent, orderReceipt);
+                        // Creates new DeliveryEvent of the book
+                        sendEvent(new DeliveryEvent(orderReceipt, bookOrderEvent.getCustomer().getDistance(), bookOrderEvent.getCustomer().getAddress()));
+                        //System.out.println("Selling service: The customer: " + bookOrderEvent.getCustomer().getName() + " bought the book: " + bookOrderEvent.getBookName());
+                        //return;
+                }
+                else
+                {
+                    complete(bookOrderEvent,null);
+                    //System.out.println("The order " + bookOrderEvent.getCustomer().getName() + " failed in Selling service.");
                 }
             }
             // if the book is not available in the store
-            complete(bookOrderEvent,null);
+            else complete(bookOrderEvent,null);
         });
         //System.out.println("Selling service: "+this.getName()+" is initialized");
     }
