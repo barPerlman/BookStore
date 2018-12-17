@@ -80,14 +80,14 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-
 			synchronized (_lockerForFuturePairs) {
-				//resolve the future associated to the event e
-				Future f = _eventToFuture.get(e);//.resolve(result);    //resolve the associated future with the result
-				f.resolve(result);
-				//here we didn't remove the event and its future from the table although this data unnacassary anymore cause delete in a not bi-directional list cost O(n)
+				if (e != null && _eventToFuture.get(e) != null) {
+					//resolve the future associated to the event e
+					Future f = _eventToFuture.get(e);//.resolve(result);    //resolve the associated future with the result
+					f.resolve(result);
+					//here we didn't remove the event and its future from the table although this data unnacassary anymore cause delete in a not bi-directional list cost O(n)
+				}
 			}
-
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-
+//
 		if(_messageTypeHT.get(e.getClass())==null){		//there's no micro service which is subscribed to handle this event
 			return null;
 		}
@@ -121,7 +121,7 @@ public class MessageBusImpl implements MessageBus {
 					//get the subscribers of the e event
 					LinkedBlockingQueue<MicroService> subscribersTo_e = _messageTypeHT.get(e.getClass());
 					MicroService nextMSToGet_e = subscribersTo_e.poll();    //get the head of the queue and remove it from list
-
+					//System.out.println(nextMSToGet_e.getName());
 					//the same with MS
 
 					_microServiceToFuture.putIfAbsent(nextMSToGet_e, new LinkedBlockingQueue<>());

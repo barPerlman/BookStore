@@ -1,7 +1,6 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.CurrTickEvent;
 import bgu.spl.mics.application.messages.TerminateBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Inventory;
@@ -28,7 +27,7 @@ public class TimeService extends MicroService{
 	int currTick;
 	public TimeService(int speed, int duration) {
 		super("time");
-		currTick=1;
+		currTick=0;
 		this.speed=speed;
 		this.duration=duration;
 	}
@@ -38,12 +37,9 @@ public class TimeService extends MicroService{
 		// when TerminateBroadcast is received then the TimeService should be terminated
 		subscribeBroadcast(TerminateBroadcast.class,terminateBroadcast -> {
 			this.terminate();
-
 		});
 
-		// when CurrTickEvent is received then the TimeService gets the current tick
-		subscribeEvent(CurrTickEvent.class,currTickEvent -> {
-			complete(currTickEvent,currTick);
+		this.subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
 		});
 
 		// Defining the timer activation
